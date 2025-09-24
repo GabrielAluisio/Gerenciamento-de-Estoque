@@ -48,8 +48,17 @@ def pegar_atributos(nome_tabela):
     
     #conn.commit()
 
-def adicionar_dados(nome_tabela):
-    
+def adicionar_dados(nome_tabela, valores):
+    colunas = pegar_atributos('Produtos')
 
-print(pegar_atributos('Produtos'))
-mostrar_tabela('Produtos')
+    colunas_str = ', '.join(colunas)
+
+    query = f'''
+        INSERT INTO {nome_tabela} ({colunas_str})
+        VALUES ({', '.join(['%s'] * len(colunas))})'''
+
+        
+    comando.execute(query, valores)
+    conn.commit()
+
+mostrar_tabela('Categorias')
