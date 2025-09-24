@@ -29,4 +29,7 @@ if pergunta == '1':
 if pergunta == '2':
 
 
+    
+
+
 

@@ -61,4 +61,16 @@ def adicionar_dados(nome_tabela, valores):
     comando.execute(query, valores)
     conn.commit()
 
-mostrar_tabela('Categorias')
+def atualizar_dados(nome_tabela, atributo, valor_novo, id):
+    mostrar_tabela(nome_tabela)
+
+    query = f" UPDATE {nome_tabela} set {atributo} = '{valor_novo}' WHERE id = {id}; "
+
+    comando.execute(query)
+
+
+    conn.commit()
+    print('foi')
+
+atualizar_dados('Produtos', 'valor', 17.95, '4')
+mostrar_tabela('Produtos')
