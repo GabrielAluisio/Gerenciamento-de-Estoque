@@ -1,9 +1,18 @@
+import app
+
 pergunta = input('''
-Você deseja adicionar oque?
-_________________________________                 
-[1] Um produto
-[2] 
-[3] Atualizar dados de um aluno
-[4] Excluir aluno
-[5] Sair  
-_________________________________''')
+_________________________________        
+[1] Um adicionar um produto
+[2] Atualizar dados de um produto
+[3] Fazer movimentação de um produto
+[3] Excluir produto
+[4] Sair  
+_________________________________
+                 
+Escolha uma opção: ''')
+
+if pergunta == '1':
+
+    
+    app.mostrar_tabela('Produtos')
+

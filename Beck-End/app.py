@@ -35,6 +35,21 @@ def mostrar_tabela(nome_table):
         print(end="\n")
 
 
+def pegar_atributos(nome_tabela):
 
+    comando.execute(f"SHOW COLUMNS FROM {nome_tabela}")
+    atributos = comando.fetchall()
 
+    lista = []
+    for i in atributos:
+        if i[0] != 'id':
+            lista.append(i[0])
+    return lista
+    
+    #conn.commit()
+
+def adicionar_dados(nome_tabela):
+    
+
+print(pegar_atributos('Produtos'))
 mostrar_tabela('Produtos')
