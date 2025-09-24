@@ -35,18 +35,17 @@ def mostrar_tabela(nome_table):
         print(end="\n")
 
 
-def pegar_atributos(nome_tabela):
+def pegar_atributos(nome_tabela, id=True):
 
     comando.execute(f"SHOW COLUMNS FROM {nome_tabela}")
     atributos = comando.fetchall()
 
     lista = []
     for i in atributos:
-        if i[0] != 'id':
+        if id or i[0] != 'id':
             lista.append(i[0])
+
     return lista
-    
-    #conn.commit()
 
 def adicionar_dados(nome_tabela, valores):
     colunas = pegar_atributos('Produtos')
@@ -62,7 +61,6 @@ def adicionar_dados(nome_tabela, valores):
     conn.commit()
 
 def atualizar_dados(nome_tabela, atributo, valor_novo, id):
-    mostrar_tabela(nome_tabela)
 
     query = f" UPDATE {nome_tabela} set {atributo} = '{valor_novo}' WHERE id = {id}; "
 
@@ -70,7 +68,3 @@ def atualizar_dados(nome_tabela, atributo, valor_novo, id):
 
 
     conn.commit()
-    print('foi')
-
-atualizar_dados('Produtos', 'valor', 17.95, '4')
-mostrar_tabela('Produtos')
