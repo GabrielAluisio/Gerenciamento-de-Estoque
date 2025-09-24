@@ -19,20 +19,48 @@ conn = mysql.connector.connect(
 comando = conn.cursor()
 
 
-def mostrar_tabela(nome_table):
+def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colunas=0):
 
     comando.execute(f"SELECT * FROM {nome_table};", )
     result = comando.fetchall()
 
     for i in result:
-        
-        for r in range(len(i)):
-            if r >= len(i) - 1:
-                print(i[r], end="")
-            else:
-                print(i[r], end=" - ")
 
-        print(end="\n")
+        if todas_as_colunas == True:
+        
+            for r in range(onde_comecar_as_colunas, len(i)):
+                if r >= len(i) - 1:
+                    print(i[r], end="")
+                else:
+                    print(i[r], end=" - ")
+
+            print(end="\n")
+
+        # Define o números de colunas
+        else:
+
+            for r in range(onde_comecar_as_colunas, todas_as_colunas):
+                if r >= todas_as_colunas - 1:
+                    print(i[r], end="")
+                else:
+                    print(i[r], end=" - ")
+
+            print(end="\n")
+
+
+def mostrar_tabela(nome_table, mostrar_item_pelo_id=False):
+
+    if mostrar_item_pelo_id == False:
+        comando.execute(f"SELECT * FROM {nome_table}; ", )
+
+    else:
+        comando.execute(f"SELECT * FROM {nome_table} where id = {mostrar_item_pelo_id}; ", ) 
+
+    result = comando.fetchall()
+
+    return result
+
+
 
 
 def pegar_atributos(nome_tabela, id=True):
@@ -48,7 +76,7 @@ def pegar_atributos(nome_tabela, id=True):
     return lista
 
 def adicionar_dados(nome_tabela, valores):
-    colunas = pegar_atributos('Produtos')
+    colunas = pegar_atributos(nome_tabela, id=False)
 
     colunas_str = ', '.join(colunas)
 
@@ -68,3 +96,5 @@ def atualizar_dados(nome_tabela, atributo, valor_novo, id):
 
 
     conn.commit()
+
+print(mostrar_tabela('Produtos', 5)[0][2])
