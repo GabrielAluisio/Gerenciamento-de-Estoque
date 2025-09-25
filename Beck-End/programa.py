@@ -3,10 +3,10 @@ import app
 pergunta = input('''
 _________________________________        
 [1] Um adicionar um produto
-[2] Atualizar dado do banco de dados
+[2] Atualizar dado no banco de dados
 [3] Fazer movimentação de um produto
-[3] Excluir dado
-[4] Sair  
+[4] Excluir dado
+[5] Sair  
 _________________________________
                  
 Escolha uma opção: ''')
@@ -117,7 +117,7 @@ elif pergunta == '3':
         data = input("Digite a data da movimentação. ( Ex: 2025-05-28 ): ").strip()
         app.adicionar_dados("Movimentacao", (tipo, produto_id, quantidade, data))
 
-        
+
 
     app.mostrar_tabela_print("Produtos")
 
