@@ -97,4 +97,12 @@ def atualizar_dados(nome_tabela, atributo, valor_novo, id):
 
     conn.commit()
 
-print(mostrar_tabela('Produtos', 5)[0][2])
+def excluir_dados(nome_tabela, id):
+
+    if nome_tabela == 'Produtos':
+        atualizar_dados('Produtos', 'ativo', 0, id)
+
+    else:
+        comando.execute(f"""DELETE FROM {nome_tabela} WHERE id = {id};"""),
+
+    conn.commit()

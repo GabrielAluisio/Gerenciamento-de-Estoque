@@ -14,6 +14,7 @@ CREATE TABLE Produtos (
     total_estoque INT NOT NULL DEFAULT 1,
     valor DECIMAL(10,2),
     categoria_id INT,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY(categoria_id) REFERENCES Categorias(id) ON DELETE SET NULL
 );
 
@@ -27,18 +28,13 @@ CREATE TABLE Movimentacao (
     tipo_movimentacao_id INT,
     produto_id INT NOT NULL,
     quantidade INT NOT NULL DEFAULT 1,
-    data_movimentacao DATE,
+    data_movimentacao DATETIME,
     FOREIGN KEY(tipo_movimentacao_id) REFERENCES Tipo_movimentacao(id) ON DELETE SET NULL,
     FOREIGN KEY(produto_id) REFERENCES Produtos(id) ON DELETE CASCADE
 );
 
 
 INSERT INTO Categorias (nome) VALUES ('Comida'), ('Bebida'), ('Sobremesa');
-
-
-INSERT INTO Produtos (nome, total_estoque, valor, categoria_id) VALUES ('Hamburguer', 50, 2,5, 1);
-INSERT INTO Produtos (nome, total_estoque, valor, categoria_id) VALUES ('Pão', 100, 2, 1);
-
 
 INSERT INTO Tipo_movimentacao (nome) VALUES ('Entrada'), ('Saida');
 

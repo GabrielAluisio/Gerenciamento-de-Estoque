@@ -5,8 +5,7 @@ _________________________________
 [1] Um adicionar um produto
 [2] Atualizar dado no banco de dados
 [3] Fazer movimentação de um produto
-[4] Excluir dado
-[5] Sair  
+[4] Excluir dados
 _________________________________
                  
 Escolha uma opção: ''')
@@ -20,9 +19,10 @@ if pergunta == '1':
     app.mostrar_tabela_print("Categorias")
     print('-----------')
     categoria= input('Escolha uma opção:').strip()
+    ativo = True
 
 
-    app.adicionar_dados('Produtos', (nome, total_no_estoque, valor, categoria))
+    app.adicionar_dados('Produtos', (nome, total_no_estoque, valor, categoria, ativo))
 
     app.mostrar_tabela_print('Produtos')
 
@@ -114,14 +114,37 @@ elif pergunta == '3':
 
         app.atualizar_dados('Produtos', 'total_estoque', quantidade, produto_id)
 
-        data = input("Digite a data da movimentação. ( Ex: 2025-05-28 ): ").strip()
-        app.adicionar_dados("Movimentacao", (tipo, produto_id, quantidade, data))
+        data = input("Digite a data da movimentação. ( Ex: 2025-09-30 19:45:12 ): ").strip()
+        app.adicionar_dados("Movimentacao", (tipo, produto_id, quantidade_nova, data))
 
 
 
     app.mostrar_tabela_print("Produtos")
 
     app.mostrar_tabela_print("Movimentacao")
+    
+elif pergunta == '4':
+    
+    i = int(input('''
+[1] Categorias
+[2] Produtos
+[3] Movimentação
+[4] Tipo de Movimentação
+        
+Qual tabela você gostaria de alterar? '''))
+    
+    opcao = {
+        1: "Categorias",
+        2: "Produtos",
+        3: "Movimentacao",
+        4: "tipo_movimentacao"
+    }
 
+    tabela = opcao.get(i)
 
+    app.mostrar_tabela_print(tabela, 2, 0)
+    
+    id = input("Digite o id do item que dejesa excluir: ").strip()
+
+    app.excluir_dados(tabela, id)
 
