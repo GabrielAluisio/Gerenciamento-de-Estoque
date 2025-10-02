@@ -34,3 +34,40 @@ botao_fechar.addEventListener('click', () => {
 
     
 })
+
+function mostrar_atributos(nome_tabela){
+    fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`)
+        .then(response => response.json())
+        .then(dados => {
+            const tabela = document.getElementById('tabela');
+            tabela.innerHTML = '';
+
+            const thead = document.createElement('thead'); 
+            tabela.appendChild(thead);
+
+            const tr = document.createElement('tr');
+            thead.appendChild(tr);
+
+            const td = document.createElement('td');
+            td.textContent = '';
+            tr.appendChild(td); // adiciona o td à tr
+
+            dados.forEach(atributo => {
+                const td = document.createElement('td');
+                td.textContent = atributo; // Aqui vai adicionar o atributo no td
+
+                tr.appendChild(td); // adiciona o td à tr
+            })
+        })
+        .catch(erro => console.error("Erro ao buscar atributos:", erro));
+}
+
+
+
+
+const teste = document.getElementById('cadastro')
+
+teste.addEventListener('click', () => {
+    mostrar_atributos('Produtos');
+});
+

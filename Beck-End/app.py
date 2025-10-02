@@ -1,24 +1,28 @@
 import mysql.connector
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 # Pegar a senha do BD no .env
 from dotenv import load_dotenv
 import os
 
+
+app = Flask(__name__)
+CORS(app)
+
 load_dotenv()
 senha = os.getenv("senha_do_bd") 
 
-#Executar a conexão com o MYSQL
-conn = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password=senha,
-    database='PI'
-)
+def conectar():
+    return mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password=senha,
+        database='PI'
+    )
 
 
-comando = conn.cursor()
-
-
+'''
 def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colunas=0):
 
     comando.execute(f"SELECT * FROM {nome_table};", )
@@ -59,32 +63,39 @@ def mostrar_tabela(nome_table, mostrar_item_pelo_id=False):
     result = comando.fetchall()
 
     return result
+'''
 
 
+@app.route("/<nome_tabela>/atributos", methods=["GET"])
+def pegar_atributos(nome_tabela):
 
+    conn = conectar()
+    cursor = conn.cursor()
 
-def pegar_atributos(nome_tabela, id=True):
+    cursor.execute(f"SHOW COLUMNS FROM {nome_tabela}")
+    atributos = cursor.fetchall()
 
-    comando.execute(f"SHOW COLUMNS FROM {nome_tabela}")
-    atributos = comando.fetchall()
+    cursor.close()
+    conn.close()
 
     lista = []
     for i in atributos:
-        if id or i[0] != 'id':
-            lista.append(i[0])
+        lista.append(i[0])
+    
 
-    return lista
-
+    return jsonify(lista), 200
+    
+'''
 def adicionar_dados(nome_tabela, valores):
     colunas = pegar_atributos(nome_tabela, id=False)
 
     colunas_str = ', '.join(colunas)
 
-    query = f'''
+    query = f''''''
         INSERT INTO {nome_tabela} ({colunas_str})
         VALUES ({', '.join(['%s'] * len(colunas))})'''
 
-        
+'''       
     comando.execute(query, valores)
     conn.commit()
 
@@ -105,4 +116,7 @@ def excluir_dados(nome_tabela, id):
     else:
         comando.execute(f"""DELETE FROM {nome_tabela} WHERE id = {id};"""),
 
-    conn.commit()
+    conn.commit()'''
+
+if __name__ == "__main__":
+    app.run(debug=True)
