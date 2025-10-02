@@ -50,10 +50,6 @@ body > header{
     cursor: pointer;
 }
 
-#icon_menu {
-    
-}
-
 #menu_lateral {
     grid-area: 2 / 1 / -1 / 2;
     background-color: var(--menu_lateral);
@@ -172,12 +168,124 @@ div.estoque > section > header > button{
     letter-spacing: .5px;
     color: white;
     border-radius: 7px;
+    cursor: pointer;
 }
 
 div.estoque > section > header > button:hover{
     background-color: #247231;
 }
 
+div.estoque > section > nav {
+    display: flex;
+    justify-content: space-between;
+    grid-area: 2 / 1 / 3 / -1 ;
+    padding: 20px;
+}
+
+div.estoque nav #pesquisa{
+    max-width: 500px;
+    width: 35vw;
+    height: 35px;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+    outline: none;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.507);
+    border: 1.5px solid rgba(0, 0, 0, 0.233);
+}
+
+div.estoque nav #pesquisa:hover{
+    background-color: rgb(228, 228, 228);
+}
+
+div.estoque nav > button{
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 35px;
+    font-size: 16px;
+    border: transparent;
+    background-color:#3276B1;
+    letter-spacing: .5px;
+    color: white;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+div.estoque nav > button:hover {
+    background-color: #286091;
+}
 
 
+#cortina_filtros {
+    width: 300px;
+    display: none;
+    grid-template: 50px 350px 50px / 1fr;
+    height: 450px;
+    border-radius: 8px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.548);
+    border: 1px solid rgba(0, 0, 0, 0.363);
+}
 
+#cortina_filtros header {
+    grid-area: 1 / 1 / 2 / -1;
+
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    background-color:#3276B1;
+    border-radius: 7px 7px 0px 0px ;
+    color: white;
+    padding-left: 20px;
+
+}
+
+#cortina_filtros > section{
+    grid-area: 2 / 1 / 3 / -1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 2px;
+    color: #000000;
+}
+
+#cortina_filtros > section input, #categorias_filtro{
+    font-size: 17px;
+    margin-bottom: 10px;
+    outline: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: transparent;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.507);
+    border: 1.5px solid rgba(0, 0, 0, 0.233);
+}
+
+#cortina_filtros > footer{
+    grid-area: 3 / 1 / 4 / -1;
+    gap: 10px;
+    display: flex;
+    justify-content: end;
+    padding-right: 20px;
+    
+}
+#botao_aplicar ,#botao_fechar {
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 35px;
+    font-size: 16px;
+    background-color:#ffffff;
+    color: rgb(46, 46, 46);
+    letter-spacing: .5px;
+    border-radius: 7px;
+    cursor: pointer;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.507);
+    border: 1.5px solid rgba(0, 0, 0, 0.233);
+}
+
+#botao_aplicar {
+    color: white;
+    background-color:#3276B1;
+}

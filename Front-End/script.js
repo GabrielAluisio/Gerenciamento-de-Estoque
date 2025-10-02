@@ -13,3 +13,24 @@ botao_estoque.addEventListener('click', () => {
 
     
 })
+
+const botao_filtros = document.getElementById('botao_filtros')
+const cortina_filtros = document.getElementById('cortina_filtros')
+const botao_fechar = document.getElementById('botao_fechar')
+
+botao_filtros.addEventListener('click', () => {
+    cortina_filtros.style.display = 'grid';
+    botao_filtros.style.display = 'none';
+
+
+    
+})
+
+botao_fechar.addEventListener('click', () => {
+    
+    
+    cortina_filtros.style.display = 'none';
+    botao_filtros.style.display = 'flex';
+
+    
+})

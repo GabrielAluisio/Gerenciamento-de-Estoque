@@ -50,6 +50,63 @@
                     <h1>Produtos em Estoque</h1>
                     <button><span class="material-symbols-outlined">add</span>Cadastrar Produto</button>
                 </header>
+
+                <nav>
+                    
+                    <input type="text" name="pesquisa" id="pesquisa" placeholder="Procurar produto...">
+
+                    <button id="botao_filtros">
+                            <span class="material-symbols-outlined">filter_alt</span>Filtros
+                    </button>
+                    
+                    <div id="cortina_filtros">
+                        <header><span class="material-symbols-outlined">filter_alt</span>Filtros</header>
+                        
+                        <section>
+                            
+                            <label for="categorias_filtro">Categoria: </label>
+                            <select name="categorias_filtro" id="categorias_filtro">
+                                <option value=""></option>
+                                <option value="maca">Maçã</option>
+                                <option value="banana">Banana</option>
+                                <option value="laranja">Laranja</option>
+                            </select>  
+                            
+
+                            
+                            <label for="preco_min">Preço Miníno: </label>
+                            <input type="number" name="preco_min" id="preco_min">
+                            
+
+                            
+                            <label for="preco_max">Preço Máximo: </label>
+                            <input type="number" name="preco_max" id="preco_max">
+                            
+
+                            
+                            <label for="Estoque_min">Estoque mínimo: </label>
+                            <input type="number" name="Estoque_min" id="Estoque_min">
+                            
+
+                            
+                            <label for="Estoque_max">Preço Maximo: </label>
+                            <input type="number" name="Estoque_max" id="Estoque_max">
+                            
+                        </section>    
+
+                        <footer>
+                            <button id="botao_fechar">
+                                Fechar
+                            </button>
+                            <button id="botao_aplicar">
+                                Aplicar
+                            </button>
+                         </footer>
+                                  
+                    </div>
+
+                    
+                </nav>
             </section>
 
         </div>
