@@ -21,11 +21,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+/* Botão Cadastrar Produto */
+const exibir_cadastro = document.getElementById('exibir_cadastro')
+
+const aba_cadastrar = document.getElementById('aba_cadastrar')
+
+const botao_fechar_cadastro = document.getElementById('fechar_cadastro')
+const botao_voltar_cadastro = document.getElementById('botao_voltar')
+
+exibir_cadastro.addEventListener('click', () => {
+    aba_cadastrar.style.display = 'flex';
+
+})
+
+botao_fechar_cadastro.addEventListener('click', () => {
+    aba_cadastrar.style.display = 'none';
+})
+
+botao_voltar_cadastro.addEventListener('click', () => {
+    aba_cadastrar.style.display = 'none';
+})
+
+
 /* Botão Filtro*/ 
 
 const botao_filtros = document.getElementById('botao_filtros')
 const cortina_filtros = document.getElementById('cortina_filtros')
-const botao_fechar = document.getElementById('botao_fechar')
+const botao_fechar_filtro = document.getElementById('botao_fechar')
 
 botao_filtros.addEventListener('click', () => {
     cortina_filtros.style.display = 'grid';
@@ -35,7 +57,7 @@ botao_filtros.addEventListener('click', () => {
     
 })
 
-botao_fechar.addEventListener('click', () => {
+botao_fechar_filtro.addEventListener('click', () => {
     
     
     cortina_filtros.style.display = 'none';
