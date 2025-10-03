@@ -220,6 +220,12 @@ div.estoque nav > button:hover {
 }
 
 
+
+
+
+
+/* Filtro */
+
 #cortina_filtros {
     background-color: white;
     z-index: 2;
@@ -297,6 +303,15 @@ div.estoque nav > button:hover {
     background-color:#3276B1;
 }
 
+
+
+
+
+
+
+
+/* Tabela */
+
 #div_tabela{
     display: flex;
     justify-content: center;
@@ -312,8 +327,6 @@ div.estoque nav > button:hover {
 }
 
 #tabela th, #tabela td {
-    
-
     padding: 8px 12px;
 }
 
@@ -326,11 +339,62 @@ div.estoque nav > button:hover {
 }
 
 #tabela tr:nth-child(even) {
-background-color: #f2f2f2; /* linhas alternadas */
+    background-color: #f2f2f2; /* linhas alternadas */
 }
 
 
-#tebela tbody {
 
+
+
+
+
+
+/* Buttons */
+
+tr div{
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    gap: 10px;
+} 
+
+button.editar, button.excluir  {
+    border: 0px;
+    margin-top: 5px;
+    cursor: pointer; 
+    color: #333;
+    background-color: transparent;
+    font-size: 20px;
+}
+
+button.editar {
+     color: #007bff9c;
+}
+
+button.editar:hover {
+     color: #007bff;
+}
+
+button.excluir {
+    color: rgba(255, 0, 0, 0.466);
+}
+
+button.excluir:hover {
+    color: red;
+}
+
+
+input.campo-edicao {
+    min-width: 0;
+    border: 0px;
+    outline: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.356);
+    flex: 1;
+    font-size: 16px;
+}
+
+
+button.excluir:hover {
+    color: red;
 }
 

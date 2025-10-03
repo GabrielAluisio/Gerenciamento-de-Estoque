@@ -16,7 +16,6 @@ if pergunta == '1':
     valor = input('Valor (unidade): ').strip()
     
     print('-----------')
-    app.mostrar_tabela_print("Categorias")
     print('-----------')
     categoria= input('Escolha uma opção:').strip()
     ativo = True

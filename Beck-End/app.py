@@ -51,19 +51,27 @@ def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colu
 
             print(end="\n")
 
-
-def mostrar_tabela(nome_table, mostrar_item_pelo_id=False):
-
-    if mostrar_item_pelo_id == False:
-        comando.execute(f"SELECT * FROM {nome_table}; ", )
-
-    else:
-        comando.execute(f"SELECT * FROM {nome_table} where id = {mostrar_item_pelo_id}; ", ) 
-
-    result = comando.fetchall()
-
-    return result
 '''
+@app.route("/<nome_tabela>", methods=["GET"])
+def mostrar_tabela(nome_tabela):
+    apenas_ativos = request.args.get("ativos", "true").lower() == "true" #  /produtos?ativos=false
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    if apenas_ativos:
+        query = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela} WHERE ativo = 1"
+
+    else:   
+        query = f"SELECT * FROM {nome_tabela}"
+
+
+    cursor.execute(query)
+    result = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+    return jsonify(result), 200
 
 
 @app.route("/<nome_tabela>/atributos", methods=["GET"])
@@ -85,20 +93,30 @@ def pegar_atributos(nome_tabela):
 
     return jsonify(lista), 200
     
-'''
-def adicionar_dados(nome_tabela, valores):
-    colunas = pegar_atributos(nome_tabela, id=False)
+@app.route('/<nome_tabela>/adicionar', methods=['POST'])
+def adicionar_dados(nome_tabela):
+
+    dados = request.get_json()
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    colunas = pegar_atributos(nome_tabela)
 
     colunas_str = ', '.join(colunas)
 
-    query = f''''''
+    query = f'''
         INSERT INTO {nome_tabela} ({colunas_str})
         VALUES ({', '.join(['%s'] * len(colunas))})'''
 
-'''       
-    comando.execute(query, valores)
+     
+    cursor.execute(query, dados)
     conn.commit()
 
+    cursor.close()
+    conn.close()
+
+'''
 def atualizar_dados(nome_tabela, atributo, valor_novo, id):
 
     query = f" UPDATE {nome_tabela} set {atributo} = '{valor_novo}' WHERE id = {id}; "

@@ -14,6 +14,15 @@ botao_estoque.addEventListener('click', () => {
     
 })
 
+
+document.addEventListener('DOMContentLoaded', () => {
+    criar_tabela('Produtos'); // chama automaticamente ao carregar
+});
+
+
+
+/* Botão Filtro*/ 
+
 const botao_filtros = document.getElementById('botao_filtros')
 const cortina_filtros = document.getElementById('cortina_filtros')
 const botao_fechar = document.getElementById('botao_fechar')
@@ -34,13 +43,16 @@ botao_fechar.addEventListener('click', () => {
 
     
 })
+/* Funções */ 
+
+/* Tabela */ 
+
 
 function mostrar_atributos(nome_tabela){
     fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`)
         .then(response => response.json())
         .then(dados => {
             const tabela = document.getElementById('tabela');
-            tabela.innerHTML = '';
 
             const thead = document.createElement('thead'); 
             tabela.appendChild(thead);
@@ -48,26 +60,83 @@ function mostrar_atributos(nome_tabela){
             const tr = document.createElement('tr');
             thead.appendChild(tr);
 
-            const td = document.createElement('td');
-            td.textContent = '';
-            tr.appendChild(td); // adiciona o td à tr
+            const th = document.createElement('th');
+            th.textContent = '';
+            tr.appendChild(th); // adiciona o th à tr
 
             dados.forEach(atributo => {
-                const td = document.createElement('td');
-                td.textContent = atributo; // Aqui vai adicionar o atributo no td
+                if (atributo == 'ativo'){
+                    return;
+                }
+                const th = document.createElement('th');
+                th.textContent = atributo; // Aqui vai adicionar o atributo no th
 
-                tr.appendChild(td); // adiciona o td à tr
+                tr.appendChild(th); // adiciona o th à tr
             })
         })
         .catch(erro => console.error("Erro ao buscar atributos:", erro));
 }
 
+function mostrar_colunas(nome_tabela, ativos = false){
+    fetch(`http://127.0.0.1:5000/${nome_tabela}?ativos=${ativos}`)
+        .then(response => response.json())
+        .then(dados => {
+            const tabela = document.getElementById('tabela');
+
+            const tbody = document.createElement('tbody'); 
+            tabela.appendChild(tbody);
+            
+
+            dados.forEach(linha => {
+                const tr = document.createElement('tr');
+                tbody.appendChild(tr);
+
+                // botão Editar
 
 
 
-const teste = document.getElementById('cadastro')
+                const editar = document.createElement('button');
+                editar.classList.add('editar');
+                editar.setAttribute('aria-label', 'Editar tarefa');
+                // icone
+                editar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
 
-teste.addEventListener('click', () => {
-    mostrar_atributos('Produtos');
-});
+                // botão Delete
+
+                const excluir = document.createElement('button')
+                excluir.classList.add('excluir')
+                excluir.setAttribute('aria-label', 'Excluir tarefa')
+                // icone
+                excluir.innerHTML = '<span class="material-symbols-outlined">delete</span>'
+
+                const div = document.createElement('div');
+                div.appendChild(editar)
+                div.appendChild(excluir)
+                
+                tr.appendChild(div); 
+
+                linha.forEach(valor => {
+                    
+
+                    const td = document.createElement('td');
+                    td.textContent = valor; 
+
+                    tr.appendChild(td); 
+                })
+                
+            })
+        })
+}
+
+function criar_tabela(nome_tabela){
+    mostrar_atributos(nome_tabela)
+    mostrar_colunas(nome_tabela, true)
+}
+
+/* Botão Adicionar */
+
+
+
+
+
 
