@@ -21,6 +21,45 @@ def conectar():
         database='PI'
     )
 
+def inserir_dados(nome_tabela, valores):
+
+    conn = conectar()
+    cursor = conn.cursor()
+    colunas = pegar_atributos(nome_tabela, id=False, ativo=False)
+
+    colunas_str = ', '.join(colunas)
+
+    query = f'''
+        INSERT INTO {nome_tabela} ({colunas_str})
+        VALUES ({', '.join(['%s'] * len(colunas))})'''
+
+        
+    cursor.execute(query, valores)
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+
+def pegar_atributos(nome_tabela, id=True, ativo=True):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute(f"SHOW COLUMNS FROM {nome_tabela}")
+    atributos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    lista = []
+    for coluna in atributos:
+        nome_coluna = coluna[0]
+
+        if (id or nome_coluna != 'id') and (ativo or nome_coluna != 'ativo'):
+            lista.append(nome_coluna)
+
+    return lista
+
+
 
 '''
 def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colunas=0):
@@ -75,7 +114,7 @@ def mostrar_tabela(nome_tabela):
 
 
 @app.route("/<nome_tabela>/atributos", methods=["GET"])
-def pegar_atributos(nome_tabela):
+def pegar_atributos_front(nome_tabela):
 
     conn = conectar()
     cursor = conn.cursor()
@@ -92,29 +131,37 @@ def pegar_atributos(nome_tabela):
     
 
     return jsonify(lista), 200
-    
-@app.route('/<nome_tabela>/adicionar', methods=['POST'])
-def adicionar_dados(nome_tabela):
 
+
+
+@app.route('/Produtos/adicionar', methods=['POST'])
+def adicionar_produto():
     dados = request.get_json()
+    nome = dados['nome']
+    total_estoque = dados['total_estoque']
+    valor = dados['valor']
+    categoria = dados['categoria_id']
 
-    conn = conectar()
-    cursor = conn.cursor()
 
-    colunas = pegar_atributos(nome_tabela)
+    inserir_dados('Produtos', (nome, total_estoque, valor, categoria))
+    
+    return jsonify({'mensagem': f'Produto {nome} cadastrado com sucesso!'})
 
-    colunas_str = ', '.join(colunas)
 
-    query = f'''
-        INSERT INTO {nome_tabela} ({colunas_str})
-        VALUES ({', '.join(['%s'] * len(colunas))})'''
 
-     
-    cursor.execute(query, dados)
-    conn.commit()
+        
+    
 
-    cursor.close()
-    conn.close()
+
+    
+
+
+
+
+
+
+
+
 
 '''
 def atualizar_dados(nome_tabela, atributo, valor_novo, id):
