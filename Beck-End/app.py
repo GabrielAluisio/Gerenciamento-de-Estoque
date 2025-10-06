@@ -21,46 +21,6 @@ def conectar():
         database='PI'
     )
 
-def inserir_dados(nome_tabela, valores):
-
-    conn = conectar()
-    cursor = conn.cursor()
-    colunas = pegar_atributos(nome_tabela, id=False, ativo=False)
-
-    colunas_str = ', '.join(colunas)
-
-    query = f'''
-        INSERT INTO {nome_tabela} ({colunas_str})
-        VALUES ({', '.join(['%s'] * len(colunas))})'''
-
-        
-    cursor.execute(query, valores)
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-
-
-def pegar_atributos(nome_tabela, id=True, ativo=True):
-    conn = conectar()
-    cursor = conn.cursor()
-
-    cursor.execute(f"SHOW COLUMNS FROM {nome_tabela}")
-    atributos = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    lista = []
-    for coluna in atributos:
-        nome_coluna = coluna[0]
-
-        if (id or nome_coluna != 'id') and (ativo or nome_coluna != 'ativo'):
-            lista.append(nome_coluna)
-
-    return lista
-
-
-
 '''
 def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colunas=0):
 
@@ -93,16 +53,23 @@ def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colu
 '''
 @app.route("/<nome_tabela>", methods=["GET"])
 def mostrar_tabela(nome_tabela):
-    apenas_ativos = request.args.get("ativos", "true").lower() == "true" #  /produtos?ativos=false
+    mostrar_coluna_ativos = request.args.get("ativos", "true").lower() == "true" #  /produtos?ativos=false
+    apagados = request.args.get("apagados", "true").lower() == "true" # 
 
     conn = conectar()
     cursor = conn.cursor()
 
-    if apenas_ativos:
-        query = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela} WHERE ativo = 1"
+    if not mostrar_coluna_ativos:
+        query = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela} "
 
     else:   
-        query = f"SELECT * FROM {nome_tabela}"
+        query = f"SELECT * FROM {nome_tabela} "
+
+    if apagados:
+        query += 'WHERE ativo = 0'
+
+    else:
+        query += 'WHERE ativo = 1'
 
 
     cursor.execute(query)
@@ -114,7 +81,7 @@ def mostrar_tabela(nome_tabela):
 
 
 @app.route("/<nome_tabela>/atributos", methods=["GET"])
-def pegar_atributos_front(nome_tabela):
+def pegar_atributos(nome_tabela, back=False, incluir_id=True, incluir_ativo=True):
 
     conn = conectar()
     cursor = conn.cursor()
@@ -127,30 +94,56 @@ def pegar_atributos_front(nome_tabela):
 
     lista = []
     for i in atributos:
-        lista.append(i[0])
-    
 
+        if (incluir_id or i[0] != 'id') and (incluir_ativo or i[0] != 'ativo'):
+            lista.append(i[0])
+    
+    if back:
+        return lista
+    
     return jsonify(lista), 200
 
 
 
-@app.route('/Produtos/adicionar', methods=['POST'])
-def adicionar_produto():
+@app.route('/<nome_tabela>/adicionar', methods=['POST'])
+def adicionar_produto(nome_tabela):
     dados = request.get_json()
-    nome = dados['nome']
-    total_estoque = dados['total_estoque']
-    valor = dados['valor']
-    categoria = dados['categoria_id']
 
-
-    inserir_dados('Produtos', (nome, total_estoque, valor, categoria))
+    try:
     
-    return jsonify({'mensagem': f'Produto {nome} cadastrado com sucesso!'})
+        valores = list(dados.values())
+        
+        conn = conectar()
+        cursor = conn.cursor()
 
+        colunas = pegar_atributos(nome_tabela, back=True, incluir_id=False, incluir_ativo=False)
+        colunas_str = ', '.join(colunas)
 
+        query = f'''
+            INSERT INTO {nome_tabela} ({colunas_str})
+            VALUES ({', '.join(['%s'] * len(colunas))})'''
+
+            
+        cursor.execute(query, valores)
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'sucesso': True, 'mensagem': 'Produto adicionado com sucesso!'}), 200
+    
+    
+    except Exception as e:
+    
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
+        return jsonify({'sucesso': False, 'mensagem': str(e)}), 500
 
         
-    
+
 
 
     

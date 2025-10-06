@@ -1,3 +1,109 @@
+/* Funções */ 
+
+/* Tabela */ 
+
+
+async  function mostrar_atributos(nome_tabela){
+    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`);
+    const dados = await response.json();
+
+    const tabela = document.getElementById('tabela');
+    tabela.innerHTML = ''; 
+
+    const thead = document.createElement('thead'); 
+    tabela.appendChild(thead);
+
+    const tr = document.createElement('tr');
+    thead.appendChild(tr);
+
+    const th = document.createElement('th');
+    th.textContent = '';
+    tr.appendChild(th); // adiciona o th à tr
+
+    dados.forEach(atributo => {
+        if (atributo == 'ativo'){
+            return;
+        }
+        const th = document.createElement('th');
+        th.textContent = atributo; // Aqui vai adicionar o atributo no th
+
+        tr.appendChild(th); // adiciona o th à tr
+         })
+        }
+        
+async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostrar_apagados = false){
+    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?ativos=${mostrar_coluna_ativos}&apagados=${mostrar_apagados}`)
+    const dados = await response.json();
+
+
+    const tabela = document.getElementById('tabela');
+
+    const tbody = document.createElement('tbody'); 
+    tabela.appendChild(tbody);
+
+
+    dados.forEach(linha => {
+    const tr = document.createElement('tr');
+    tbody.appendChild(tr);
+
+    // botão Editar
+
+
+
+    const editar = document.createElement('button');
+    editar.classList.add('editar');
+    editar.setAttribute('aria-label', 'Editar tarefa');
+    // icone
+    editar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
+
+    // botão Delete
+
+    const excluir = document.createElement('button')
+    excluir.classList.add('excluir')
+    excluir.setAttribute('aria-label', 'Excluir tarefa')
+    // icone
+    excluir.innerHTML = '<span class="material-symbols-outlined">delete</span>'
+
+    const div = document.createElement('div');
+    div.appendChild(editar)
+    div.appendChild(excluir)
+
+    tr.appendChild(div); 
+
+    linha.forEach(valor => {
+        
+
+        const td = document.createElement('td');
+        td.textContent = valor; 
+
+        tr.appendChild(td); 
+    })
+
+    })
+        }
+
+
+async function criar_tabela(nome_tabela) {
+    await mostrar_atributos(nome_tabela);
+    await mostrar_colunas(nome_tabela, false); 
+}
+
+async function adicionar_dados(nome_tabela, dados){
+    const res = await fetch(`http://127.0.0.1:5000/${nome_tabela}/adicionar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    });
+
+    if (!res.ok) throw new Error('Erro na requisição');
+
+    return await res.json(); // retorna o JSON do back-end
+}
+
+
+
+
+
 const botao_estoque = document.getElementById('botao_estoque');
 const sub_menu_estoque = document.getElementById('sub_menu_estoque');
 
@@ -66,127 +172,43 @@ botao_voltar_cadastro.addEventListener('click', () => {
     aba_cadastrar.style.display = 'none';
 })
 
-
-
 const botao_salvar = document.getElementById('cadastrar_salvar');
 
-botao_salvar.addEventListener('click', () => {
-    const nome = document.getElementById('nome').value;
-    const total_estoque = document.getElementById('total_estoque').value;
-    const valor = document.getElementById('valor').value;
-    const categoria_id = document.getElementById('categorias').value;
 
-    const dados = {nome, total_estoque, valor, categoria_id};
 
-    fetch('http://127.0.0.1:5000/Produtos/adicionar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados)
-    })
+botao_salvar.addEventListener('click', async () => {
+    const nome = document.getElementById('nome_produto').value
+    const total_estoque = document.getElementById('total_estoque').value
+    const valor = document.getElementById('valor').value
+    const categoria = document.getElementById('categorias').value
 
-    .then(res => res.json())
-    .then(resposta => {
-        if (Object.keys(dados).length === 4) {
+    if (!nome || !total_estoque || !valor || !categoria) {
+        alert('Preencha todos os campos!');
+        return; 
+    }
+
+     try {
+        const resposta = await adicionar_dados('Produtos', { nome, total_estoque, valor, categoria });
+
+        if (resposta.sucesso) {
             aba_cadastrar.style.display = 'none';
             criar_tabela('Produtos');
-        }
-    })
-
-    .catch(erro => console.error('Erro:', erro));
-
-})
-
-
-
-/* Funções */ 
-
-/* Tabela */ 
-
-
-async  function mostrar_atributos(nome_tabela){
-    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`);
-    const dados = await response.json();
-
-    const tabela = document.getElementById('tabela');
-    tabela.innerHTML = ''; 
-
-    const thead = document.createElement('thead'); 
-    tabela.appendChild(thead);
-
-    const tr = document.createElement('tr');
-    thead.appendChild(tr);
-
-    const th = document.createElement('th');
-    th.textContent = '';
-    tr.appendChild(th); // adiciona o th à tr
-
-    dados.forEach(atributo => {
-        if (atributo == 'ativo'){
-            return;
-        }
-        const th = document.createElement('th');
-        th.textContent = atributo; // Aqui vai adicionar o atributo no th
-
-        tr.appendChild(th); // adiciona o th à tr
-         })
-        }
-        
-async function mostrar_colunas(nome_tabela, ativos = false){
-    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?ativos=${ativos}`)
-    const dados = await response.json();
-
-
-    const tabela = document.getElementById('tabela');
-
-    const tbody = document.createElement('tbody'); 
-    tabela.appendChild(tbody);
-
-
-    dados.forEach(linha => {
-    const tr = document.createElement('tr');
-    tbody.appendChild(tr);
-
-    // botão Editar
-
-
-
-    const editar = document.createElement('button');
-    editar.classList.add('editar');
-    editar.setAttribute('aria-label', 'Editar tarefa');
-    // icone
-    editar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
-
-    // botão Delete
-
-    const excluir = document.createElement('button')
-    excluir.classList.add('excluir')
-    excluir.setAttribute('aria-label', 'Excluir tarefa')
-    // icone
-    excluir.innerHTML = '<span class="material-symbols-outlined">delete</span>'
-
-    const div = document.createElement('div');
-    div.appendChild(editar)
-    div.appendChild(excluir)
-
-    tr.appendChild(div); 
-
-    linha.forEach(valor => {
-        
-
-        const td = document.createElement('td');
-        td.textContent = valor; 
-
-        tr.appendChild(td); 
-    })
-
-    })
+        } else {
+            alert('Erro: ' + resposta.mensagem);
         }
 
+    } catch (erro) {
+        console.error('Erro:', erro);
+        alert('Erro ao conectar com o servidor!');
+    }
+});
+    
+    
 
-async function criar_tabela(nome_tabela) {
-    await mostrar_atributos(nome_tabela); // espera criar o thead
-    await mostrar_colunas(nome_tabela, true); // depois preenche o tbody
-}
+
+
+
+
 
 /* Botão Adicionar */
 
