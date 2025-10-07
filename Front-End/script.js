@@ -1,5 +1,71 @@
 /* Funções */ 
 
+
+function desativar(nome_tabela, id){
+    fetch(`http://127.0.0.1:5000/${nome_tabela}/Desativar/${id}`, {
+        method: 'PATCH'
+    })
+
+    .then(response => {
+        if (response.ok) {  // checa se deu sucesso (status 200)
+            criar_tabela(nome_tabela);  // chama a função só se der certo
+        } else {
+            console.error("Erro ao desativar o produto");
+        }
+    })
+
+    .catch(error => console.error(error));
+}
+
+function atualizar(nome_tabela, atributo, valor_novo, id){
+    fetch(`http://127.0.0.1:5000/${nome_tabela}/Atualizar`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+
+        body: JSON.stringify({
+            'id': id,
+            'nome_tabela': nome_tabela,
+            'atributo': atributo,
+            'valor_novo': valor_novo
+        })
+    })
+
+        .then(response => {
+            if (response.ok) {  // checa se deu sucesso (status 200)
+                criar_tabela(nome_tabela);  // chama a função só se der certo
+                return response.json();
+            } else {
+                console.error("Erro ao desativar o produto");
+            }
+        })
+            .then(data => console.log('Item atualizado:', data))
+            .catch(error => console.error(error));
+
+}
+
+
+async function adicionar_dados(nome_tabela, dados){
+    const res = await fetch(`http://127.0.0.1:5000/${nome_tabela}/adicionar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    });
+
+    if (!res.ok) throw new Error('Erro na requisição');
+
+    return await res.json(); // retorna o JSON do back-end
+}
+
+function pegar_dados(nome_tabela){
+    return fetch(`http://127.0.0.1:5000/${nome_tabela}`)
+        .then(response => response.json());
+}
+
+
+
+
 /* Tabela */ 
 
 
@@ -50,11 +116,8 @@ async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostra
 
         // botão Editar
 
-
-
         const editar = document.createElement('button');
         editar.classList.add('editar');
-        editar.setAttribute('aria-label', 'Editar tarefa');
         // icone
         editar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
 
@@ -63,8 +126,29 @@ async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostra
         const excluir = document.createElement('button')
         excluir.classList.add('excluir')
         excluir.setAttribute('aria-label', 'Excluir tarefa')
+
+        excluir.addEventListener('click', () => {
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: "Você vai desativar este produto!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545', // vermelho
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, desativar!',
+                cancelButtonText: 'Cancelar'
+                
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    desativar(nome_tabela, linha[0]);  // chama sua função
+                    }
+                })
+            })
         // icone
         excluir.innerHTML = '<span class="material-symbols-outlined">delete</span>'
+
+        
+        
 
         const div = document.createElement('div');
         div.appendChild(editar)
@@ -72,39 +156,103 @@ async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostra
 
         tr.appendChild(div); 
 
-        linha.forEach(valor => {
-            
-
+        linha.forEach((valor, index) => {
             const td = document.createElement('td');
             td.textContent = valor; 
 
             tr.appendChild(td); 
-        })
 
+            editar.addEventListener('click', () => {
+                
+
+                td.innerHTML = `<input type="text" value="${valor}">`;
+                const inputEdit = td.querySelector('input');
+
+                const confirmar = document.createElement('button');
+                confirmar.innerHTML = '<span class="material-symbols-outlined">check</span>';
+                confirmar.className = 'confirmar'
+                div.replaceChild(confirmar, editar)
+
+
+
+                const voltar = document.createElement('button');
+                voltar.innerHTML = '<span class="material-symbols-outlined">close</span>'
+                voltar.className = 'voltar'
+                div.replaceChild(voltar, excluir)
+
+
+                voltar.addEventListener('click', () => {
+                    Swal.fire({
+                        title: 'Cancelar edição?',
+                        text: 'As alterações não serão salvas.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545', // vermelho
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sim, cancelar',
+                        cancelButtonText: 'Voltar',})
+                        .then((result) => {
+                            if (result.isConfirmed) {
+                                criar_tabela(nome_tabela)
+                        }else{
+                            return
+                        }
+                        })
+
+
+                    
+                })
+
+                confirmar.addEventListener('click', () => {
+                
+    
+                    const novoValor = inputEdit.value.trim();
+                    if(novoValor === '') {
+                        Swal.fire('Erro', 'O valor não pode ficar vazio!', 'error');
+                        inputEdit.focus();
+                        return;
+                    }
+
+        
+                    Swal.fire({
+                        title: 'Confirmar atualização?',
+                        text: 'Deseja realmente salvar as alterações?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sim, confirmar',
+                        confirmButtonColor: '#28a745', 
+                        cancelButtonColor: '#8e9499ff', 
+                        cancelButtonText: 'Voltar'           
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            td.textContent = novoValor; // substitui de volta pelo texto
+                                const ths = Array.from(document.querySelectorAll('#tabela thead tr th'));
+                                const atributos = ths.slice(1).map(th => th.textContent);
+                                const atributo = atributos[index]; // pega o atributo correto correspondente ao td
+                                atualizar(nome_tabela, atributo, novoValor, linha[0])
+                                Swal.fire('Sucesso', 'Registro atualizado com sucesso!', 'success');
+                        }
+                    })
+                })
+            })
+        })
     })
-}
+};
+
+
+
+                                            
+                                        
+                            
+
+
 
 async function criar_tabela(nome_tabela) {
     await mostrar_atributos(nome_tabela);
     await mostrar_colunas(nome_tabela, false); 
 }
 
-async function adicionar_dados(nome_tabela, dados){
-    const res = await fetch(`http://127.0.0.1:5000/${nome_tabela}/adicionar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados)
-    });
 
-    if (!res.ok) throw new Error('Erro na requisição');
-
-    return await res.json(); // retorna o JSON do back-end
-}
-
-function pegar_dados(nome_tabela){
-    return fetch(`http://127.0.0.1:5000/${nome_tabela}`)
-        .then(response => response.json());
-}
 
 
 const botao_estoque = document.getElementById('botao_estoque');
@@ -152,6 +300,11 @@ botao_fechar_filtro.addEventListener('click', () => {
     
 })
 
+const botao_aplicar_filtro = document.getElementById('filtro_aplicar')
+
+botao_aplicar_filtro.addEventListener('click', () => {
+    salvarEdicao()
+})
 
 
 /* Cadastrar Produto */
@@ -199,40 +352,53 @@ pegar_dados('categorias')
 const botao_salvar = document.getElementById('cadastrar_salvar');
 
 botao_salvar.addEventListener('click', async () => {
-    const nome = document.getElementById('nome_produto').value
-    const total_estoque = document.getElementById('total_estoque').value
-    const valor = document.getElementById('valor').value
-    const categoria_selecionada = categoria.value
+    const nome = document.getElementById('nome_produto').value;
+    const total_estoque = document.getElementById('total_estoque').value;
+    const valor = document.getElementById('valor').value;
+    const categoria_selecionada = categoria.value;
 
+    // Validação simples
     if (!nome || !total_estoque || !valor || !categoria_selecionada) {
-        alert('Preencha todos os campos!');
-        return; 
+        Swal.fire('Erro', 'Por favor, preencha todos os campos!', 'error');
+        return;
     }
 
-     try {
-        const resposta = await adicionar_dados('Produtos', { nome, total_estoque, valor, categoria_selecionada });
+    try {
+        // Alerta de confirmação antes de cadastrar
+        const result = await Swal.fire({
+            title: 'Cadastrar produto',
+            text: 'Tem certeza que deseja cadastrar este produto?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745', // verde
+            cancelButtonColor: '#6c757d', // cinza
+            confirmButtonText: 'Sim, cadastrar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        });
 
-        if (resposta.sucesso) {
-            aba_cadastrar.style.display = 'none';
-            criar_tabela('Produtos');
-        } else {
-            alert('Erro: ' + resposta.mensagem);
+        // Se o usuário confirmar
+        if (result.isConfirmed) {
+            const resposta = await adicionar_dados('Produtos', {
+                nome,
+                total_estoque,
+                valor,
+                categoria_selecionada
+            });
+
+            if (resposta.sucesso) {
+                Swal.fire('Sucesso', 'Produto cadastrado com sucesso!', 'success');
+                aba_cadastrar.style.display = 'none';
+                criar_tabela('Produtos');
+            } else {
+                Swal.fire('Erro', resposta.mensagem, 'error');
+            }
         }
 
     } catch (erro) {
-        console.error('Erro:', erro);
-        alert('Erro ao conectar com o servidor!');
+        console.error(erro);
+        Swal.fire('Erro', 'Não foi possível conectar ao servidor!', 'error');
     }
 });
-
-
-
-
-
-
-
-
-
-
 
 
