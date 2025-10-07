@@ -30,9 +30,11 @@ async  function mostrar_atributos(nome_tabela){
         tr.appendChild(th); // adiciona o th à tr
          })
         }
+
+
         
-async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostrar_apagados = false){
-    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?ativos=${mostrar_coluna_ativos}&apagados=${mostrar_apagados}`)
+async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostrar_itens_apagados = false){
+    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?ativos=${mostrar_coluna_ativos}&apagados=${mostrar_itens_apagados}`)
     const dados = await response.json();
 
 
@@ -43,45 +45,44 @@ async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostra
 
 
     dados.forEach(linha => {
-    const tr = document.createElement('tr');
-    tbody.appendChild(tr);
+        const tr = document.createElement('tr');
+        tbody.appendChild(tr);
 
-    // botão Editar
+        // botão Editar
 
 
 
-    const editar = document.createElement('button');
-    editar.classList.add('editar');
-    editar.setAttribute('aria-label', 'Editar tarefa');
-    // icone
-    editar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
+        const editar = document.createElement('button');
+        editar.classList.add('editar');
+        editar.setAttribute('aria-label', 'Editar tarefa');
+        // icone
+        editar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
 
-    // botão Delete
+        // botão Delete
 
-    const excluir = document.createElement('button')
-    excluir.classList.add('excluir')
-    excluir.setAttribute('aria-label', 'Excluir tarefa')
-    // icone
-    excluir.innerHTML = '<span class="material-symbols-outlined">delete</span>'
+        const excluir = document.createElement('button')
+        excluir.classList.add('excluir')
+        excluir.setAttribute('aria-label', 'Excluir tarefa')
+        // icone
+        excluir.innerHTML = '<span class="material-symbols-outlined">delete</span>'
 
-    const div = document.createElement('div');
-    div.appendChild(editar)
-    div.appendChild(excluir)
+        const div = document.createElement('div');
+        div.appendChild(editar)
+        div.appendChild(excluir)
 
-    tr.appendChild(div); 
+        tr.appendChild(div); 
 
-    linha.forEach(valor => {
-        
+        linha.forEach(valor => {
+            
 
-        const td = document.createElement('td');
-        td.textContent = valor; 
+            const td = document.createElement('td');
+            td.textContent = valor; 
 
-        tr.appendChild(td); 
+            tr.appendChild(td); 
+        })
+
     })
-
-    })
-        }
-
+}
 
 async function criar_tabela(nome_tabela) {
     await mostrar_atributos(nome_tabela);
@@ -100,8 +101,10 @@ async function adicionar_dados(nome_tabela, dados){
     return await res.json(); // retorna o JSON do back-end
 }
 
-
-
+function pegar_dados(nome_tabela){
+    return fetch(`http://127.0.0.1:5000/${nome_tabela}`)
+        .then(response => response.json());
+}
 
 
 const botao_estoque = document.getElementById('botao_estoque');
@@ -126,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-/* Botão Filtro*/ 
+/* Filtro*/ 
 
 const botao_filtros = document.querySelector('.botao_filtros')
 const cortina_filtros = document.querySelector('.cortina_filtros')
@@ -151,7 +154,9 @@ botao_fechar_filtro.addEventListener('click', () => {
 
 
 
-/* Botão Cadastrar Produto */
+/* Cadastrar Produto */
+
+
 const exibir_cadastro = document.querySelector('.exibir_cadastro')
 
 const aba_cadastrar = document.querySelector('.aba_cadastrar')
@@ -172,23 +177,40 @@ botao_voltar_cadastro.addEventListener('click', () => {
     aba_cadastrar.style.display = 'none';
 })
 
+
+const categoria = document.getElementById('categorias')
+
+
+
+pegar_dados('categorias')
+    .then(dados => {
+        dados.forEach(linha => {
+            const option = document.createElement('option');
+            option.value = linha[0]
+            option.textContent = linha[1]; 
+            categoria.appendChild(option);
+    });
+})
+
+
+
+/* Salvar Cadastro */ 
+
 const botao_salvar = document.getElementById('cadastrar_salvar');
-
-
 
 botao_salvar.addEventListener('click', async () => {
     const nome = document.getElementById('nome_produto').value
     const total_estoque = document.getElementById('total_estoque').value
     const valor = document.getElementById('valor').value
-    const categoria = document.getElementById('categorias').value
+    const categoria_selecionada = categoria.value
 
-    if (!nome || !total_estoque || !valor || !categoria) {
+    if (!nome || !total_estoque || !valor || !categoria_selecionada) {
         alert('Preencha todos os campos!');
         return; 
     }
 
      try {
-        const resposta = await adicionar_dados('Produtos', { nome, total_estoque, valor, categoria });
+        const resposta = await adicionar_dados('Produtos', { nome, total_estoque, valor, categoria_selecionada });
 
         if (resposta.sucesso) {
             aba_cadastrar.style.display = 'none';
@@ -202,15 +224,12 @@ botao_salvar.addEventListener('click', async () => {
         alert('Erro ao conectar com o servidor!');
     }
 });
-    
-    
 
 
 
 
 
 
-/* Botão Adicionar */
 
 
 

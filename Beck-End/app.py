@@ -59,17 +59,22 @@ def mostrar_tabela(nome_tabela):
     conn = conectar()
     cursor = conn.cursor()
 
-    if not mostrar_coluna_ativos:
-        query = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela} "
+    if nome_tabela == 'Produtos':
 
-    else:   
-        query = f"SELECT * FROM {nome_tabela} "
+        if not mostrar_coluna_ativos:
+            query = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela} "
 
-    if apagados:
-        query += 'WHERE ativo = 0'
+        else:   
+            query = f"SELECT * FROM {nome_tabela} "
+
+        if apagados:
+            query += 'WHERE ativo = 0'
+
+        else:
+            query += 'WHERE ativo = 1'
 
     else:
-        query += 'WHERE ativo = 1'
+        query = f"SELECT * FROM {nome_tabela} ORDER BY id ASC "
 
 
     cursor.execute(query)
@@ -81,7 +86,7 @@ def mostrar_tabela(nome_tabela):
 
 
 @app.route("/<nome_tabela>/atributos", methods=["GET"])
-def pegar_atributos(nome_tabela, back=False, incluir_id=True, incluir_ativo=True):
+def mostrar_atributos(nome_tabela, back=False, incluir_id=True, incluir_ativo=True):
 
     conn = conectar()
     cursor = conn.cursor()
@@ -116,7 +121,7 @@ def adicionar_produto(nome_tabela):
         conn = conectar()
         cursor = conn.cursor()
 
-        colunas = pegar_atributos(nome_tabela, back=True, incluir_id=False, incluir_ativo=False)
+        colunas = mostrar_atributos(nome_tabela, back=True, incluir_id=False, incluir_ativo=False)
         colunas_str = ', '.join(colunas)
 
         query = f'''
@@ -142,7 +147,7 @@ def adicionar_produto(nome_tabela):
             pass
         return jsonify({'sucesso': False, 'mensagem': str(e)}), 500
 
-        
+
 
 
 
