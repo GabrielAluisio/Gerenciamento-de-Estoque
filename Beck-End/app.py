@@ -53,31 +53,28 @@ def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colu
 '''
 @app.route("/<nome_tabela>", methods=["GET"])
 def mostrar_tabela(nome_tabela):
-    mostrar_coluna_ativos = request.args.get("ativos", "true").lower() == "true" #  /produtos?ativos=false
-    apagados = request.args.get("apagados", "true").lower() == "true" # 
+    apagados = request.args.get("apagados", "true").lower() == "true"
+    letras = request.args.get("letras") 
 
     conn = conectar()
     cursor = conn.cursor()
 
-    if nome_tabela == 'Produtos':
+    query_base = f"SELECT * FROM {nome_tabela}"
+    filtros = []
 
-        if not mostrar_coluna_ativos:
-            query = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela} "
-
-        else:   
-            query = f"SELECT * FROM {nome_tabela} "
-
+    if nome_tabela == "Produtos":
         if apagados:
-            query += 'WHERE ativo = 0'
-
+            filtros.append("ativo = 0")
         else:
-            query += 'WHERE ativo = 1'
+            filtros.append("ativo = 1")
 
-    else:
-        query = f"SELECT * FROM {nome_tabela} ORDER BY id ASC "
+    if letras:  # só adiciona se houver pesquisa
+        filtros.append(f"nome LIKE '%{letras}%'")
 
+    if filtros:
+        query_base += " WHERE " + " AND ".join(filtros)
 
-    cursor.execute(query)
+    cursor.execute(query_base)
     result = cursor.fetchall()
 
     cursor.close()
@@ -151,12 +148,6 @@ def adicionar_produto(nome_tabela):
 
 
 
-    
-
-
-
-
-
 @app.route('/<nome_tabela>/Desativar/<int:id>', methods=['PATCH'])
 def desativarProduto(nome_tabela, id):
 
@@ -193,6 +184,7 @@ def atualizar_dados(nome_tabela):
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500  
+    
 
 '''
 def excluir_dados(nome_tabela, id):

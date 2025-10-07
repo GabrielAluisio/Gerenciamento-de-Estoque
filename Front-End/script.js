@@ -69,7 +69,7 @@ function pegar_dados(nome_tabela){
 /* Tabela */ 
 
 
-async  function mostrar_atributos(nome_tabela){
+async  function atributos_tabela(nome_tabela){
     const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`);
     const dados = await response.json();
 
@@ -99,8 +99,8 @@ async  function mostrar_atributos(nome_tabela){
 
 
         
-async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostrar_itens_apagados = false){
-    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?ativos=${mostrar_coluna_ativos}&apagados=${mostrar_itens_apagados}`)
+async function tabela_colunas(nome_tabela, apagados = false, letras=''){
+    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?apagados=${apagados}&letras=${letras}`)
     const dados = await response.json();
 
 
@@ -247,9 +247,9 @@ async function mostrar_colunas(nome_tabela, mostrar_coluna_ativos = true, mostra
 
 
 
-async function criar_tabela(nome_tabela) {
-    await mostrar_atributos(nome_tabela);
-    await mostrar_colunas(nome_tabela, false); 
+async function criar_tabela(nome_tabela, apagados=false, letras='') {
+    await atributos_tabela(nome_tabela);
+    await tabela_colunas(nome_tabela, apagados, letras);  
 }
 
 
@@ -272,9 +272,42 @@ botao_estoque.addEventListener('click', () => {
 })
 
 
+function enviarFiltros() {
+    const filtros = {
+        preco_min:  document.getElementById('preco_min').value,
+        preco_max: document.getElementById('preco_max').value,
+        Estoque_min: document.getElementById('Estoque_min').value,
+        Estoque_max: document.getElementById('Estoque_max').value,
+        categorias_filtro: document.getElementById('categorias_filtro').value
+    };
+
+    fetch('http://127.0.0.1:5000/produtos/filtro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(filtros)
+    })
+    .then(res => res.json())
+    .then(dados => {
+        atualizarTabela(dados);
+    });
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     criar_tabela('Produtos'); // chama automaticamente ao carregar
 });
+
+const inputpesquisa = document.getElementById('pesquisa')
+
+inputpesquisa.addEventListener('keydown', (e) => { 
+    if (e.key === 'Enter'){
+        criar_tabela("Produtos", false, inputpesquisa.value)
+    }
+})
+
+
+
+
 
 
 /* Filtro*/ 
@@ -286,19 +319,39 @@ const botao_fechar_filtro = document.querySelector('.botao_fechar')
 botao_filtros.addEventListener('click', () => {
     cortina_filtros.style.display = 'grid';
     botao_filtros.style.display = 'none';
-
-
     
 })
 
-botao_fechar_filtro.addEventListener('click', () => {
-    
-    
+botao_fechar_filtro.addEventListener('click', () => { 
     cortina_filtros.style.display = 'none';
     botao_filtros.style.display = 'flex';
 
+})
+
+
+const preco_min = document.getElementById('preco_min')
+const preco_max = document.getElementById('preco_max')
+const Estoque_min = document.getElementById('Estoque_min')
+const categorEstoque_maxias_filtro = document.getElementById('Estoque_max')
+
+const categorias_filtro = document.getElementById('categorias_filtro')
+pegar_dados('categorias')
+    .then(dados => {
+        dados.forEach(linha => {
+            const option = document.createElement('option');
+            option.value = linha[0]
+            option.textContent = linha[1]; 
+            categorias_filtro.appendChild(option);
+    });
+})
+
+const filtro_aplicar = document.getElementById('filtro_aplicar')
+
+filtro_aplicar.addEventListener('click', () => {
     
 })
+
+
 
 const botao_aplicar_filtro = document.getElementById('filtro_aplicar')
 
