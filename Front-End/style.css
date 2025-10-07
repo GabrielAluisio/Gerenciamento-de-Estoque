@@ -466,7 +466,7 @@ div.estoque nav > button:hover {
     text-align: center;
 }
 
-#tabela th, #tabela td {
+#tabela th, #tabela td{
     padding: 8px 12px;
 }
 
@@ -476,6 +476,21 @@ div.estoque nav > button:hover {
     font-size: 15px;
     padding: 25px;
     border-bottom: 1px solid #d1d8db;
+}
+
+#tabela input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #999898;
+    font-size: 16px;
+    color: #000000cc;
+    text-align: center;
+    width: 100%;
+}
+
+#tabela input:focus {
+    outline: none; 
+    border-bottom-color: #5f5f5f; 
 }
 
 #tabela tr:nth-child(even) {
@@ -494,17 +509,34 @@ div.estoque nav > button:hover {
 tr div{
     display: flex;
     justify-content: center;
+    align-items: center;
     height: 100%;
-    gap: 10px;
+    max-width: 80px;
+    width: 100%;
 } 
 
-button.editar, button.excluir  {
+button.editar, button.excluir{
     border: 0px;
     margin-top: 5px;
     cursor: pointer; 
     color: #333;
     background-color: transparent;
     font-size: 20px;
+    margin: 5px;
+}
+
+button.confirmar, button.voltar{
+    border: 0px;
+    margin-top: 5px;
+    cursor: pointer; 
+    color: #333;
+    background-color: transparent;
+    font-size: 20px;
+    margin: 5px;
+}
+
+button.confirmar > span, button.voltar > span{
+    font-weight: 900;
 }
 
 button.editar {
@@ -515,26 +547,20 @@ button.editar:hover {
      color: #007bff;
 }
 
-button.excluir {
+button.excluir, button.voltar {
     color: rgba(255, 0, 0, 0.466);
 }
 
-button.excluir:hover {
+button.excluir:hover, button.voltar:hover {
     color: red;
 }
 
-
-input.campo-edicao {
-    min-width: 0;
-    border: 0px;
-    outline: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.356);
-    flex: 1;
-    font-size: 16px;
+button.confirmar{
+    color: #35aa49;
 }
 
-
-button.excluir:hover {
-    color: red;
+button.confirmar:hover {
+    color: #247231;
 }
+
 

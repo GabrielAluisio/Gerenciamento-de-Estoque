@@ -157,20 +157,44 @@ def adicionar_produto(nome_tabela):
 
 
 
+@app.route('/<nome_tabela>/Desativar/<int:id>', methods=['PATCH'])
+def desativarProduto(nome_tabela, id):
 
+    if nome_tabela == 'Produtos':
+        query = f" UPDATE Produtos set ativo = 0 WHERE id = {'%s'}; "
 
+    conn = conectar()
+    cursor = conn.cursor()
 
-
-'''
-def atualizar_dados(nome_tabela, atributo, valor_novo, id):
-
-    query = f" UPDATE {nome_tabela} set {atributo} = '{valor_novo}' WHERE id = {id}; "
-
-    comando.execute(query)
-
-
+    cursor.execute(query, (id, ))
     conn.commit()
 
+    return jsonify({"sucesso": f"{nome_tabela} {id} desativado"}), 200
+
+
+
+@app.route('/<nome_tabela>/Atualizar', methods=['PUT'])
+def atualizar_dados(nome_tabela):
+
+    dados = request.get_json()
+    atributo = dados['atributo']
+    valor_novo = dados['valor_novo']
+    id = dados['id']
+    
+    try:
+        conn = conectar()
+        cursor = conn.cursor()
+
+        query = f"UPDATE {nome_tabela} SET {atributo} = %s WHERE id = %s"
+        cursor.execute(query, (valor_novo, id))
+        conn.commit()
+
+        return jsonify({"sucesso": f"{nome_tabela} {id} atualizado"}), 200  
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500  
+
+'''
 def excluir_dados(nome_tabela, id):
 
     if nome_tabela == 'Produtos':
@@ -179,7 +203,7 @@ def excluir_dados(nome_tabela, id):
     else:
         comando.execute(f"""DELETE FROM {nome_tabela} WHERE id = {id};"""),
 
-    conn.commit()'''
+    conn.commit(  '''
 
 if __name__ == "__main__":
     app.run(debug=True)
