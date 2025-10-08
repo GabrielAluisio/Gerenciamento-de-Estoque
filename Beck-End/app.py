@@ -52,21 +52,25 @@ def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colu
 
 '''
 @app.route("/<nome_tabela>", methods=["GET"])
-def mostrar_tabela(nome_tabela):
+def pegar_coluna(nome_tabela):
     apagados = request.args.get("apagados", "true").lower() == "true"
     letras = request.args.get("letras") 
 
     conn = conectar()
     cursor = conn.cursor()
 
-    query_base = f"SELECT * FROM {nome_tabela}"
+    
     filtros = []
+    query_base = f"SELECT * FROM {nome_tabela}"
 
     if nome_tabela == "Produtos":
-        if apagados:
+        if apagados:      
             filtros.append("ativo = 0")
         else:
+            query_base = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela}"
             filtros.append("ativo = 1")
+
+    
 
     if letras:  # só adiciona se houver pesquisa
         filtros.append(f"nome LIKE '%{letras}%'")
@@ -96,7 +100,6 @@ def mostrar_atributos(nome_tabela, back=False, incluir_id=True, incluir_ativo=Tr
 
     lista = []
     for i in atributos:
-
         if (incluir_id or i[0] != 'id') and (incluir_ativo or i[0] != 'ativo'):
             lista.append(i[0])
     
@@ -176,11 +179,18 @@ def atualizar_dados(nome_tabela):
         conn = conectar()
         cursor = conn.cursor()
 
+        print("Tabela:", nome_tabela)
+        print("Atributo:", atributo)
+        print("Valor:", valor_novo)
+        print("ID:", id)
         query = f"UPDATE {nome_tabela} SET {atributo} = %s WHERE id = %s"
+        print("Query:", query)
         cursor.execute(query, (valor_novo, id))
         conn.commit()
+        print("Linhas afetadas:", cursor.rowcount)
 
-        return jsonify({"sucesso": f"{nome_tabela} {id} atualizado"}), 200  
+
+        return jsonify({"sucesso": True, 'mensagem': f"{nome_tabela} {id} atualizado"}), 200  
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500  
