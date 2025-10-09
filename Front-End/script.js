@@ -8,7 +8,6 @@ async function desativar(nome_tabela, id){
 
     .then(async response => {
         if (response.ok) {  // checa se deu sucesso (status 200)
-            await atributos_tabela('Produtos')
             await atualizar_tabela('Produtos');
         } else {
             console.error("Erro ao desativar o produto");
@@ -77,9 +76,14 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
 /* Tabela */ 
 
 
-async function atributos_tabela(nome_tabela){
-    const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`);
-    const dados = await response.json();
+async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados = false) {
+
+    if (dados == null){
+        dados = await pegar_dados(nome_tabela, false, mostrar_desativados);
+    }
+
+    dados_atributos = await pegar_dados(nome_tabela, true);
+    
 
     const tabela = document.getElementById('tabela');
     tabela.innerHTML = ''; 
@@ -94,7 +98,7 @@ async function atributos_tabela(nome_tabela){
     th.textContent = '';
     tr.appendChild(th); // adiciona o th à tr
 
-    dados.forEach(atributo => {
+    dados_atributos.forEach(atributo => {
         if (atributo == 'ativo'){
             return;
         }
@@ -102,16 +106,8 @@ async function atributos_tabela(nome_tabela){
         th.textContent = atributo; // Aqui vai adicionar o atributo no th
 
         tr.appendChild(th); // adiciona o th à tr
-         })
-        }
-
-async function atualizar_tabela(nome_tabela, ativo = false) {
-    
-    dados = await pegar_dados(nome_tabela);
-
-    console.log(dados)
-
-    const tabela = document.getElementById('tabela');
+    })
+        
 
     const tbody = document.createElement('tbody');
     tabela.appendChild(tbody);
@@ -209,8 +205,6 @@ async function atualizar_tabela(nome_tabela, ativo = false) {
                             }
 
                             td.textContent = novoValor;
-
-                            await atributos_tabela('Produtos')
                             await atualizar_tabela('Produtos');
                         }
                     });
@@ -235,7 +229,6 @@ async function atualizar_tabela(nome_tabela, ativo = false) {
                     cancelButtonText: 'Voltar',
                 }).then(async (result) => {
                         if (result.isConfirmed) {
-                            await atributos_tabela('Produtos')
                             await atualizar_tabela('Produtos');
                     }else{
                         return
@@ -288,7 +281,6 @@ function enviarFiltros() {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await atributos_tabela('Produtos')
     await atualizar_tabela('Produtos');
 });
 
@@ -324,10 +316,29 @@ inputpesquisa.addEventListener('keydown', async (e) => {
             return; // para aqui, não atualiza a tabela
         }
 
-        // Atualiza a tabela normalmente
-        atualizar_tabela('Produtos', atributo, dados);
+        
+        await atualizar_tabela('Produtos', dados);
     }
 });
+
+// Usa o evento 'input' para disparar a cada mudança no campo
+inputpesquisa.addEventListener('input', async () => {
+    const valorPesquisa = inputpesquisa.value.trim();
+
+    if (valorPesquisa === "") {
+        // Opcional: atualizar tabela com todos os produtos ou limpar
+        const todosProdutos = await pegar_dados('Produtos', false);
+        await atualizar_tabela('Produtos', todosProdutos);
+        return;
+    }
+
+    // Busca dados filtrados
+    const dados = await pegar_dados('Produtos', false, false, valorPesquisa);
+
+    // Atualiza tabela com os resultados
+    await atualizar_tabela('Produtos', dados);
+});
+
 
 
 
@@ -459,7 +470,6 @@ botao_salvar.addEventListener('click', async () => {
             if (resposta.sucesso) {
                 Swal.fire('Sucesso', 'Produto cadastrado com sucesso!', 'success');
                 aba_cadastrar.style.display = 'none';
-                await atributos_tabela('Produtos')
                 await atualizar_tabela('Produtos');
             } else {
                 Swal.fire('Erro', resposta.mensagem, 'error');
