@@ -171,6 +171,8 @@ async function atualizar_tabela(nome_tabela, ativo = false) {
 
             div.innerHTML = '';
 
+            
+
             const confirmar = document.createElement('button');
             confirmar.innerHTML = '<span class="material-symbols-outlined">check</span>';
             confirmar.className = 'confirmar';
@@ -185,17 +187,62 @@ async function atualizar_tabela(nome_tabela, ativo = false) {
                     const valorOriginal = td.dataset.valorOriginal;
                     const atributo = td.dataset.atributo;
 
-                    if (novoValor !== valorOriginal) {
-                        atualizar(nome_tabela, atributo, novoValor, id)
+                    if(novoValor === '') {
+                        Swal.fire('Erro', 'O valor não pode ficar vazio!', 'error');
+                        return;
                     }
 
-                    td.textContent = novoValor;
-                });
+                    Swal.fire({
+                        title: 'Confirmar atualização?',
+                        text: 'Deseja realmente salvar as alterações?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sim, confirmar',
+                        confirmButtonColor: '#28a745', 
+                        cancelButtonColor: '#8e9499ff', 
+                        cancelButtonText: 'Voltar'           
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
 
-                await atributos_tabela('Produtos')
-                await atualizar_tabela('Produtos');
+                            if (novoValor !== valorOriginal) {
+                                atualizar(nome_tabela, atributo, novoValor, id)
+                            }
+
+                            td.textContent = novoValor;
+
+                            await atributos_tabela('Produtos')
+                            await atualizar_tabela('Produtos');
+                        }
+                    });
+                });
+            })
+
+            const voltar = document.createElement('button');
+            voltar.innerHTML = '<span class="material-symbols-outlined">close</span>'
+            voltar.className = 'voltar'
+            div.appendChild(voltar)
+
+
+            voltar.addEventListener('click', () => {
+                Swal.fire({
+                    title: 'Cancelar edição?',
+                    text: 'As alterações não serão salvas.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545', // vermelho
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, cancelar',
+                    cancelButtonText: 'Voltar',
+                }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            await atributos_tabela('Produtos')
+                            await atualizar_tabela('Produtos');
+                    }else{
+                        return
+                    }
+                })  
             });
-        });
+        })
     })
 };
 
