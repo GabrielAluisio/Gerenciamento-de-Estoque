@@ -1,14 +1,15 @@
 /* Funções */ 
 
 
-function desativar(nome_tabela, id){
+async function desativar(nome_tabela, id){
     fetch(`http://127.0.0.1:5000/${nome_tabela}/Desativar/${id}`, {
         method: 'PATCH'
     })
 
-    .then(response => {
+    .then(async response => {
         if (response.ok) {  // checa se deu sucesso (status 200)
-            atualizar_tabela(nome_tabela);  // chama a função só se der certo
+            await atributos_tabela('Produtos')
+            await atualizar_tabela('Produtos');
         } else {
             console.error("Erro ao desativar o produto");
         }
@@ -29,7 +30,6 @@ async function atualizar(nome_tabela, atributo, valor_novo, id){
 
           if(data.sucesso){ // ⚠️ mudou de success para sucesso
             Swal.fire('Sucesso', data.mensagem, 'success');
-            await atualizar_tabela(nome_tabela); 
         } else {
             Swal.fire('Erro', 'Não foi possível atualizar o registro', 'error');
         }
@@ -54,7 +54,22 @@ async function adicionar_dados(nome_tabela, dados){
     return await res.json(); // retorna o JSON do back-end
 }
 
-
+async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=false, letras='') { 
+    try { 
+        if(atributo){ 
+            const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`)
+            const dados = await response.json(); 
+            console.log(dados); 
+            return dados; 
+        } 
+        const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?apagados=${mostrar_desativados}&letras=${letras}`) 
+        const dados = await response.json(); 
+        console.log(dados); 
+        return dados; 
+    } catch (erro) { 
+        console.error('Erro ao pegar dados:', erro); 
+    } 
+}
 
 
 
@@ -98,7 +113,6 @@ async function atualizar_tabela(nome_tabela, ativo = false) {
 
     const tabela = document.getElementById('tabela');
 
-    // === CORPO ===
     const tbody = document.createElement('tbody');
     tabela.appendChild(tbody);
 
@@ -138,94 +152,52 @@ async function atualizar_tabela(nome_tabela, ativo = false) {
             });
         });
 
-        // colunas de dados
         linha.forEach((valor, index) => {
             const td = document.createElement('td');
-            td.textContent = valor; 
-
-            tr.appendChild(td); 
-        })
+            td.textContent = valor;
+            tr.appendChild(td);
+        });
 
         editar.addEventListener('click', () => {
             const tds = tr.querySelectorAll('td');
+            const ths = Array.from(document.querySelectorAll('#tabela thead tr th')).slice(1);
 
-            td.innerHTML = `<input type="text" value="${valor}">`;
-            const inputEdit = td.querySelector('input');
+            // transforma todos em input e guarda valor original e atributo
+            tds.forEach((td, i) => {
+                td.dataset.valorOriginal = td.textContent;
+                td.dataset.atributo = ths[i] ? ths[i].textContent : `coluna${i}`;
+                td.innerHTML = `<input type="text" value="${td.textContent}">`;
+            });
+
+            div.innerHTML = '';
 
             const confirmar = document.createElement('button');
             confirmar.innerHTML = '<span class="material-symbols-outlined">check</span>';
-            confirmar.className = 'confirmar'
-            div.replaceChild(confirmar, editar)
+            confirmar.className = 'confirmar';
+            div.appendChild(confirmar);
 
+            confirmar.addEventListener('click', async () => {
+                const id = linha[0];
 
+                tds.forEach(td => {
+                    const input = td.querySelector('input');
+                    const novoValor = input.value.trim();
+                    const valorOriginal = td.dataset.valorOriginal;
+                    const atributo = td.dataset.atributo;
 
-            const voltar = document.createElement('button');
-            voltar.innerHTML = '<span class="material-symbols-outlined">close</span>'
-            voltar.className = 'voltar'
-            div.replaceChild(voltar, excluir)
-
-
-            voltar.addEventListener('click', () => {
-                Swal.fire({
-                    title: 'Cancelar edição?',
-                    text: 'As alterações não serão salvas.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545', // vermelho
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Sim, cancelar',
-                    cancelButtonText: 'Voltar',})
-                    .then((result) => {
-                        if (result.isConfirmed) {
-                            atualizar_tabela(nome_tabela)
-                    }else{
-                        return
+                    if (novoValor !== valorOriginal) {
+                        atualizar(nome_tabela, atributo, novoValor, id)
                     }
-                    })
 
+                    td.textContent = novoValor;
+                });
 
-                
-            })
-
-            
-
-            confirmar.addEventListener('click', () => {
-            
-
-                const novoValor = inputEdit.value.trim();
-                alert(novoValor)
-                if(novoValor === '') {
-                    Swal.fire('Erro', 'O valor não pode ficar vazio!', 'error');
-                    inputEdit.focus();
-                    return;
-                }
-
-    
-                Swal.fire({
-                    title: 'Confirmar atualização?',
-                    text: 'Deseja realmente salvar as alterações?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sim, confirmar',
-                    confirmButtonColor: '#28a745', 
-                    cancelButtonColor: '#8e9499ff', 
-                    cancelButtonText: 'Voltar'           
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        td.textContent = novoValor; // substitui de volta pelo texto
-                        const ths = Array.from(document.querySelectorAll('#tabela thead tr th'));
-                        const atributos = ths.slice(1).map(th => th.textContent);
-                        const atributo = atributos[index]; // pega o atributo correto correspondente ao td
-                        alert(linha[0])
-                        
-                        atualizar(nome_tabela, atributo, novoValor, linha[0])
-                        Swal.fire('Sucesso', 'Registro atualizado com sucesso!', 'success');
-                    }
-                })
-            })
-        })
-        })
-    };
+                await atributos_tabela('Produtos')
+                await atualizar_tabela('Produtos');
+            });
+        });
+    })
+};
 
                                             
 
@@ -270,7 +242,7 @@ function enviarFiltros() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await atributos_tabela('Produtos')
-    atualizar_tabela('Produtos');
+    await atualizar_tabela('Produtos');
 });
 
 const inputpesquisa = document.getElementById('pesquisa');
@@ -383,6 +355,15 @@ botao_voltar_cadastro.addEventListener('click', () => {
 
 const categoria = document.getElementById('categorias')
 
+pegar_dados('categorias')
+    .then(dados => {
+        dados.forEach(linha => {
+            const option = document.createElement('option');
+            option.value = linha[0]
+            option.textContent = linha[1]; 
+            categoria.appendChild(option);
+    });
+})
 
 
 
@@ -431,7 +412,8 @@ botao_salvar.addEventListener('click', async () => {
             if (resposta.sucesso) {
                 Swal.fire('Sucesso', 'Produto cadastrado com sucesso!', 'success');
                 aba_cadastrar.style.display = 'none';
-                atualizar_tabela("Produto", )
+                await atributos_tabela('Produtos')
+                await atualizar_tabela('Produtos');
             } else {
                 Swal.fire('Erro', resposta.mensagem, 'error');
             }
