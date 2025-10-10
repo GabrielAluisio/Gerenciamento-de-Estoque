@@ -53,22 +53,40 @@ async function adicionar_dados(nome_tabela, dados){
     return await res.json(); // retorna o JSON do back-end
 }
 
-async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=false, letras='') { 
+async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=false, letras='', filtros='') { 
     try { 
-        if(atributo){ 
-            const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`)
-            const dados = await response.json(); 
-            console.log(dados); 
-            return dados; 
-        } 
-        const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?apagados=${mostrar_desativados}&letras=${letras}`) 
-        const dados = await response.json(); 
-        console.log(dados); 
+        let response;
+        let dados;
+
+        if (atributo) { 
+            response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`);
+        } else { 
+            response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}`);
+        }
+
+        // Verifica se o servidor respondeu corretamente
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+
+        dados = await response.json(); 
         return dados; 
+
     } catch (erro) { 
-        console.error('Erro ao pegar dados:', erro); 
+        console.error("Servidor offline ou erro de conexão:", erro);
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Servidor Offline',
+            text: 'Não foi possível conectar ao servidor. Servidor offline ou erro de conexão',
+            confirmButtonText: 'Ok'
+        });
+
+        // Retorna um array vazio pra evitar erro nas funções que usam esses dados
+        return [];
     } 
 }
+
 
 
 
@@ -259,26 +277,6 @@ botao_estoque.addEventListener('click', () => {
 })
 
 
-function enviarFiltros() {
-    const filtros = {
-        preco_min:  document.getElementById('preco_min').value,
-        preco_max: document.getElementById('preco_max').value,
-        Estoque_min: document.getElementById('Estoque_min').value,
-        Estoque_max: document.getElementById('Estoque_max').value,
-        categorias_filtro: document.getElementById('categorias_filtro').value
-    };
-
-    fetch('http://127.0.0.1:5000/produtos/filtro', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filtros)
-    })
-    .then(res => res.json())
-    .then(dados => {
-        atualizarTabela(dados);
-    });
-}
-
 
 document.addEventListener('DOMContentLoaded', async () => {
     await atualizar_tabela('Produtos');
@@ -289,7 +287,6 @@ const inputpesquisa = document.getElementById('pesquisa');
 inputpesquisa.addEventListener('keydown', async (e) => { 
     if (e.key === 'Enter') {
         const atributo = await pegar_dados('Produtos', true);
-
         // Verifica campo vazio
         if (inputpesquisa.value.trim() === "") {
             Swal.fire({
@@ -367,7 +364,7 @@ botao_fechar_filtro.addEventListener('click', () => {
 const preco_min = document.getElementById('preco_min')
 const preco_max = document.getElementById('preco_max')
 const Estoque_min = document.getElementById('Estoque_min')
-const categorEstoque_maxias_filtro = document.getElementById('Estoque_max')
+const Estoque_max = document.getElementById('Estoque_max')
 
 const categorias_filtro = document.getElementById('categorias_filtro')
 
@@ -383,6 +380,22 @@ pegar_dados('categorias')
 
 const filtro_aplicar = document.getElementById('filtro_aplicar')
 
+filtro_aplicar.addEventListener('click', async () => {
+
+    const params = new URLSearchParams({
+        preco_min: preco_min.value.trim(),
+        preco_max: preco_max.value.trim(),
+        estoque_min: Estoque_min.value.trim(),
+        estoque_max: Estoque_max.value.trim(),
+        categorias_filtro: categorias_filtro.value
+    }).toString()
+
+
+    const dados = await pegar_dados('Produtos', false, false, '', params)  
+
+    await atualizar_tabela('Produtos', dados)
+
+})
 
 
 

@@ -55,6 +55,11 @@ def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colu
 def pegar_coluna(nome_tabela):
     apagados = request.args.get("apagados", "true").lower() == "true"
     letras = request.args.get("letras") 
+    preco_min = request.args.get("preco_min")
+    preco_max = request.args.get("preco_max")
+    estoque_min = request.args.get("estoque_min")
+    estoque_max = request.args.get("estoque_max")
+    categorias_filtro = request.args.get("categorias_filtro")
 
     conn = conectar()
     cursor = conn.cursor()
@@ -70,13 +75,28 @@ def pegar_coluna(nome_tabela):
             query_base = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela}"
             filtros.append("ativo = 1")
 
-    
+    if preco_min:
+        filtros.append(f"valor >= {preco_min}")
+
+    if preco_max:
+        filtros.append(f"valor <= {preco_max}")
+
+    if estoque_min:
+        filtros.append(f"total_estoque >= {estoque_min}")
+
+    if estoque_max:
+        filtros.append(f"total_estoque <= {estoque_max}")
+
+    if categorias_filtro:
+        filtros.append(f" categoria_id = {categorias_filtro}")
 
     if letras:  # só adiciona se houver pesquisa
         filtros.append(f"nome LIKE '%{letras}%'")
 
     if filtros:
         query_base += " WHERE " + " AND ".join(filtros)
+
+    query_base += " order by id "
 
     cursor.execute(query_base)
     result = cursor.fetchall()
