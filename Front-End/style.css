@@ -87,9 +87,17 @@ body > header{
     background-color: var(--menu_lateral_hover);
 }
 
+#botao_estoque.ativo {
+    border-Left: 3px solid var(--ciano);
+}
+
 #sub_menu_estoque {
     display: none;
 
+}
+
+#sub_menu_estoque.ativa {
+    display: block;
 }
 
 #sub_menu_estoque li{
@@ -113,19 +121,26 @@ body > header{
 }
 
 
-main{
-    grid-area: 2 / 2 / - 1 / -1 ;
+
+main {
+    grid-area: 2 / 2 / -1 / -1;
 }
 
-div.estoque {
-    display: grid;
-    grid-template: 50px 1fr / 1fr ;
+/* Aqui começa a conversão da área de estoque → produtos */
+.tela {
+    display: none;
+    grid-template: 50px 1fr / 1fr;
     width: 100%;
     height: 100%;
     color: rgba(27, 27, 27, 0.774);
 }
 
-div.estoque > header{
+
+.tela.ativa{
+    display: grid;
+}
+
+.tela > header {
     display: flex;
     grid-area: 1 / 1 / 2 / -1;
     align-items: center;
@@ -134,20 +149,19 @@ div.estoque > header{
     padding-left: 20px;
 }
 
-div.estoque > header > span {
+.tela > header > span {
     color: rgba(27, 27, 27, 0.658);
 }
 
-div.estoque > section {
+.tela > section {
     display: grid;
-    grid-template: 70px 100px 1fr / 1fr ;
+    grid-template: 70px 100px 1fr / 1fr;
     box-shadow: 1px 1px 5px #0000004f;
-    margin: 0px 20px 20px 20px ;
+    margin: 0px 20px 20px 20px;
     border-radius: 20px;
 }
 
-div.estoque > section > header{
-    
+.tela > section > header {
     border-radius: 20px 20px 0px 0px;
     grid-area: 1 / 1 / 2 / -1;
     display: flex;
@@ -160,12 +174,13 @@ div.estoque > section > header{
     border-bottom: 1px solid #d1d8db;
 }
 
-div.estoque > section > header > button{
+.tela > section > header > button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 200px;
+    min-width: 200px;
     height: 40px;
+    padding: 10px;
     font-size: 17px;
     border: transparent;
     background-color: #2d8f3d;
@@ -177,9 +192,9 @@ div.estoque > section > header > button{
     transition: transform 0.3s ease;
 }
 
-div.estoque > section > header > button:hover{
+.tela > section > header > button:hover {
     background-color: #247231;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* aba Cadastro*/
@@ -235,13 +250,20 @@ div.estoque > section > header > button:hover{
 }
 
 .aba_cadastrar > section{
-    
-    display: flex; 
-    gap: 15px;
-    justify-content: space-evenly;
-    padding:  20px;
+    padding: 20px;
     border-bottom: 1px solid #d1d8db;
     margin-bottom: 20px;
+}
+
+.aba_cadastrar > section > div{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.aba_cadastrar > section > div> div {
+    width: 100%;
 }
 
 .aba_cadastrar > section select{    
@@ -290,14 +312,14 @@ div.estoque > section > header > button:hover{
 }
 
 
-div.estoque > section > nav {
+.tela > section > nav {
     display: flex;
     justify-content: space-between;
     grid-area: 2 / 1 / 3 / -1 ;
     padding: 20px;
 }
 
-div.estoque nav .pesquisa{
+.tela nav .pesquisa{
     max-width: 500px;
     width: 35vw;
     height: 35px;
@@ -309,11 +331,11 @@ div.estoque nav .pesquisa{
     border: 1.5px solid rgba(0, 0, 0, 0.233);
 }
 
-div.estoque nav .pesquisa:hover, div.estoque nav .pesquisa:focus{
+.tela nav .pesquisa:hover, .tela nav .pesquisa:focus{
     background-color: rgb(228, 228, 228);
 }
 
-div.estoque nav > button{
+.tela nav > button{
     display: flex;  
     justify-content: center;
     align-items: center;
@@ -330,7 +352,7 @@ div.estoque nav > button{
     transition: transform 0.3s ease;
 }
 
-div.estoque nav > button:hover {
+.tela nav > button:hover {
     background-color: #286091;
     transform: scale(1.03); 
 }
@@ -464,7 +486,6 @@ div.estoque nav > button:hover {
     background-color: rgb(223, 223, 223);
     border-collapse: collapse; /* bordas juntas */
     text-align: center;
-    table-layout: fixed;
 }
 
 #tabela th, #tabela td{
@@ -498,7 +519,6 @@ div.estoque nav > button:hover {
     background-color: #f2f2f2; /* linhas alternadas */
 }
 
-#tabela th:nth-child(1), #tabela td:nth-child(1) { width: 20px;}  
 
 
 
@@ -515,7 +535,6 @@ tr div{
     height: 100%;
     max-width: 80px;
     width: 100%;
-    margin-left: 10px;
 } 
 
 button.editar, button.excluir{

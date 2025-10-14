@@ -19,7 +19,7 @@ async function desativar(nome_tabela, id){
 
 async function atualizar(nome_tabela, atributo, valor_novo, id){
     try {
-        const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/Atualizar`, {
+        const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atualizar`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, nome_tabela, atributo, valor_novo })
@@ -27,7 +27,7 @@ async function atualizar(nome_tabela, atributo, valor_novo, id){
 
         const data = await response.json();
 
-          if(data.sucesso){ // ⚠️ mudou de success para sucesso
+        if(data.sucesso){ // ⚠️ mudou de success para sucesso
             Swal.fire('Sucesso', data.mensagem, 'success');
         } else {
             Swal.fire('Erro', 'Não foi possível atualizar o registro', 'error');
@@ -103,7 +103,7 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
     dados_atributos = await pegar_dados(nome_tabela, true);
     
 
-    const tabela = document.getElementById('tabela');
+    const tabela = document.querySelector(`#${nome_tabela} #tabela`);
     tabela.innerHTML = ''; 
 
     const thead = document.createElement('thead'); 
@@ -195,39 +195,39 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
             confirmar.addEventListener('click', async () => {
                 const id = linha[0];
 
-                tds.forEach(td => {
-                    const input = td.querySelector('input');
-                    const novoValor = input.value.trim();
-                    const valorOriginal = td.dataset.valorOriginal;
-                    const atributo = td.dataset.atributo;
+                // pede a confirmação apenas uma vez
+                const result = await Swal.fire({
+                    title: 'Confirmar atualização?',
+                    text: 'Deseja realmente salvar as alterações?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, confirmar',
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#8e9499ff',
+                    cancelButtonText: 'Voltar'
+                });
 
-                    if(novoValor === '') {
-                        Swal.fire('Erro', 'O valor não pode ficar vazio!', 'error');
-                        return;
-                    }
+                if (result.isConfirmed) {
+                    tds.forEach(async td => {
+                        const input = td.querySelector('input');
+                        const novoValor = input.value.trim();
+                        const valorOriginal = td.dataset.valorOriginal;
+                        const atributo = td.dataset.atributo;
 
-                    Swal.fire({
-                        title: 'Confirmar atualização?',
-                        text: 'Deseja realmente salvar as alterações?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Sim, confirmar',
-                        confirmButtonColor: '#28a745', 
-                        cancelButtonColor: '#8e9499ff', 
-                        cancelButtonText: 'Voltar'           
-                    }).then(async (result) => {
-                        if (result.isConfirmed) {
+                        if (novoValor === '') {
+                            Swal.fire('Erro', 'O valor não pode ficar vazio!', 'error');
+                            return;
+                        }
 
-                            if (novoValor !== valorOriginal) {
-                                atualizar(nome_tabela, atributo, novoValor, id)
-                            }
-
-                            td.textContent = novoValor;
-                            await atualizar_tabela('Produtos');
+                        if (novoValor !== valorOriginal) {
+                            await atualizar(nome_tabela, atributo, novoValor, id);
                         }
                     });
-                });
-            })
+
+                    await atualizar_tabela(nome_tabela)
+                }
+            });
+            
 
             const voltar = document.createElement('button');
             voltar.innerHTML = '<span class="material-symbols-outlined">close</span>'
@@ -247,7 +247,7 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
                     cancelButtonText: 'Voltar',
                 }).then(async (result) => {
                         if (result.isConfirmed) {
-                            await atualizar_tabela('Produtos');
+                            await atualizar_tabela(nome_tabela);
                     }else{
                         return
                     }
@@ -264,23 +264,26 @@ const botao_estoque = document.getElementById('botao_estoque');
 const sub_menu_estoque = document.getElementById('sub_menu_estoque');
 
 botao_estoque.addEventListener('click', () => {
-    if (sub_menu_estoque.style.display === 'none'){
-        sub_menu_estoque.style.display = 'block';
-        botao_estoque.style.borderLeft = '3px solid var(--ciano)';
-    }
-    else{
-        sub_menu_estoque.style.display ='none';
-        botao_estoque.style.border = 'none';
-    }
-
-    
-})
-
-
-
-document.addEventListener('DOMContentLoaded', async () => {
-    await atualizar_tabela('Produtos');
+    sub_menu_estoque.classList.toggle('ativa');
+    botao_estoque.classList.toggle('ativo'); 
 });
+
+const abas = document.querySelectorAll('#sub_menu_estoque li');
+const telas = document.querySelectorAll('.tela');
+
+abas.forEach(aba => {
+  aba.addEventListener('click', async () => {
+    const nome = aba.getAttribute('data-tabela').toLowerCase();
+
+    // esconde todas as telas
+    telas.forEach(tela => tela.classList.remove('ativa'));
+
+    // mostra só a selecionada
+    document.getElementById(nome).classList.add('ativa');
+    await atualizar_tabela(nome);
+  });
+});
+
 
 const inputpesquisa = document.getElementById('pesquisa');
 
@@ -483,7 +486,7 @@ botao_salvar.addEventListener('click', async () => {
             if (resposta.sucesso) {
                 Swal.fire('Sucesso', 'Produto cadastrado com sucesso!', 'success');
                 aba_cadastrar.style.display = 'none';
-                await atualizar_tabela('Produtos');
+                await atualizar_tabela('produtos');
             } else {
                 Swal.fire('Erro', resposta.mensagem, 'error');
             }

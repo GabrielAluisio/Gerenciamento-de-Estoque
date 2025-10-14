@@ -1,6 +1,7 @@
 import mysql.connector
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from datetime import datetime
 
 # Pegar a senha do BD no .env
 from dotenv import load_dotenv
@@ -68,7 +69,7 @@ def pegar_coluna(nome_tabela):
     filtros = []
     query_base = f"SELECT * FROM {nome_tabela}"
 
-    if nome_tabela == "Produtos":
+    if nome_tabela == ("produtos" or "Produtos"):
         if apagados:      
             filtros.append("ativo = 0")
         else:
@@ -100,10 +101,23 @@ def pegar_coluna(nome_tabela):
 
     cursor.execute(query_base)
     result = cursor.fetchall()
+    print(result)
+
+    novo_result = []
+    for linha in result:
+        nova_linha = []
+        for valor in linha:
+
+            if isinstance(valor, datetime):
+                valor = valor.strftime("%d/%m/%Y %H:%M:%S")
+
+            nova_linha.append(valor)
+
+        novo_result.append(nova_linha)
 
     cursor.close()
     conn.close()
-    return jsonify(result), 200
+    return jsonify(novo_result), 200
 
 
 @app.route("/<nome_tabela>/atributos", methods=["GET"])
@@ -187,7 +201,7 @@ def desativarProduto(nome_tabela, id):
 
 
 
-@app.route('/<nome_tabela>/Atualizar', methods=['PUT'])
+@app.route('/<nome_tabela>/atualizar', methods=['PUT'])
 def atualizar_dados(nome_tabela):
 
     dados = request.get_json()

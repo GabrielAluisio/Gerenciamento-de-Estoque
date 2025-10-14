@@ -28,10 +28,10 @@
                     <button id="botao_estoque"><span class="material-symbols-outlined"> box </span> Estoque</button>
 
                     <ul id="sub_menu_estoque">
-                        <li><span class="material-symbols-outlined">radio_button_unchecked </span><p>Produtos</p></li>
-                        <li><span class="material-symbols-outlined">radio_button_unchecked </span><p>Movimentações</p></li>
-                        <li><span class="material-symbols-outlined">radio_button_unchecked </span><p>Tipo de Movimentações</p></li>
-                        <li><span class="material-symbols-outlined">radio_button_unchecked </span><p>Características</p></li>
+                        <li data-tabela="produtos"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Produtos</p></li>
+                        <li data-tabela="Movimentacoes"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Movimentações</p></li>
+                        <li data-tabela="tipo_movimentacoes"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Tipo de Movimentações</p></li>
+                        <li data-tabela="caracteristicas"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Características</p></li>
                     </ul>
                 </li>
                 <li>3</li>
@@ -40,119 +40,457 @@
         </nav>
     </aside>
     <main>
-        <div class="estoque">
+        
             
+        <section id="produtos" class="tela">
             <header>
                 <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>PRODUTOS</p>
             </header>
             <section>
-                <header>
-                    <h1>Produtos em Estoque</h1>
-                    <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Produto</button>
-                </header>
-                <div class="aba_cadastrar">
                     <header>
-                        <h2>Cadastro de Produtos</h2>
-                        <button class="fechar_cadastro"><span class="material-symbols-outlined">close_small</span>Fechar</button>
+                        <h1>Produtos em Estoque</h1>
+                        <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Produto</button>
                     </header>
-                    <section>
-                        <div>
-                            <div>
-                                <label for="nome">Nome: </label>
-                                <input type="text" name="nome" id="nome_produto">
-                            </div>
-                            
-
-                            <div>
-                                <label for="total_estoque">Total Estoque: </label>
-                                <input type="number" name="total_estoque" id="total_estoque">
-                            </div>
-                        </div>
-
-                        <div>
-                            <div>
-                                <label for="valor">valor: </label>
-                                <input type="number" name="valor" id="valor">
-                            </div>
-
-                            <div>
-                                <label for="categorias">Categoria: </label>
-                                <select name="categorias" id="categorias">
-                                    <option value="" disabled selected>Selecione uma categoria</option>
-                                </select>  
-                            </div>
-                        </div>
-
-                        
-                    </section>
-
-                    <footer>
-                        <button class="botao_salvar" id="cadastrar_salvar"><span class="material-symbols-outlined">save</span>Salvar</button>
-                        <button class="botao_voltar"><span class="material-symbols-outlined">arrow_back</span>Voltar</button>
-                    </footer>
-            </div>
-
-                <nav>
-                    
-                    <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar produto...">
-
-                    <button class="botao_filtros">
-                            <span class="material-symbols-outlined">filter_alt</span>Filtros
-                    </button>
-                    
-                    <div class="cortina_filtros">
-                        <header><span class="material-symbols-outlined">filter_alt</span>Filtros</header>
-                        
+                    <div class="aba_cadastrar">
+                        <header>
+                            <h2>Cadastro de Produtos</h2>
+                            <button class="fechar_cadastro"><span class="material-symbols-outlined">close_small</span>Fechar</button>
+                        </header>
                         <section>
-                            
-                            <label for="categorias_filtro">Categoria: </label>
-                            <select name="categorias_filtro" id="categorias_filtro">
-                                <option value="" disabled selected>Selecione uma categoria</option>
-                            </select>  
-                            
+                            <div>
+                                <div>
+                                    <label for="nome">Nome: </label>
+                                    <input type="text" name="nome" id="nome_produto">
+                                </div>
+                                
+
+                                <div>
+                                    <label for="total_estoque">Total Estoque: </label>
+                                    <input type="number" name="total_estoque" id="total_estoque">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div>
+                                    <label for="valor">valor: </label>
+                                    <input type="number" name="valor" id="valor">
+                                </div>
+
+                                <div>
+                                    <label for="categorias">Categoria: </label>
+                                    <select name="categorias" id="categorias">
+                                        <option value="" disabled selected>Selecione uma categoria</option>
+                                    </select>  
+                                </div>
+                            </div>
 
                             
-                            <label for="preco_min">Preço Miníno: </label>
-                            <input type="number" name="preco_min" id="preco_min">
-                            
-
-                            
-                            <label for="preco_max">Preço Máximo: </label>
-                            <input type="number" name="preco_max" id="preco_max">
-                            
-
-                            
-                            <label for="Estoque_min">Estoque mínimo: </label>
-                            <input type="number" name="Estoque_min" id="Estoque_min">
-                            
-
-                            
-                            <label for="Estoque_max">Preço Maximo: </label>
-                            <input type="number" name="Estoque_max" id="Estoque_max">
-                            
-                        </section>    
+                        </section>
 
                         <footer>
-                            <button class="botao_fechar">
-                                Fechar
-                            </button>
-                            <button class="botao_aplicar" id="filtro_aplicar">
-                                Aplicar
-                            </button>
-                         </footer>
-                                  
-                    </div>
-                    
-                </nav>
-
-                <div id="div_tabela">
-                    <table id="tabela">
-                
-                    </table>
+                            <button class="botao_salvar" id="cadastrar_salvar"><span class="material-symbols-outlined">save</span>Salvar</button>
+                            <button class="botao_voltar"><span class="material-symbols-outlined">arrow_back</span>Voltar</button>
+                        </footer>
                 </div>
-            </section>
 
-        </div>
+                    <nav>
+                        
+                        <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar produto...">
+
+                        <button class="botao_filtros">
+                                <span class="material-symbols-outlined">filter_alt</span>Filtros
+                        </button>
+                        
+                        <div class="cortina_filtros">
+                            <header><span class="material-symbols-outlined">filter_alt</span>Filtros</header>
+                            
+                            <section>
+                                
+                                <label for="categorias_filtro">Categoria: </label>
+                                <select name="categorias_filtro" id="categorias_filtro">
+                                    <option value="" disabled selected>Selecione uma categoria</option>
+                                </select>  
+                                
+
+                                
+                                <label for="preco_min">Preço Miníno: </label>
+                                <input type="number" name="preco_min" id="preco_min">
+                                
+
+                                
+                                <label for="preco_max">Preço Máximo: </label>
+                                <input type="number" name="preco_max" id="preco_max">
+                                
+
+                                
+                                <label for="Estoque_min">Estoque mínimo: </label>
+                                <input type="number" name="Estoque_min" id="Estoque_min">
+                                
+
+                                
+                                <label for="Estoque_max">Estoque Maximo: </label>
+                                <input type="number" name="Estoque_max" id="Estoque_max">
+                                
+                            </section>    
+
+                            <footer>
+                                <button class="botao_fechar">
+                                    Fechar
+                                </button>
+                                <button class="botao_aplicar" id="filtro_aplicar">
+                                    Aplicar
+                                </button>
+                            </footer>
+                                    
+                        </div>
+                        
+                    </nav>
+
+                    <div id="div_tabela">
+                        <table id="tabela">
+                    
+                        </table>
+                    </div>
+            </section>
+        </section>
+
+        <section id="movimentacoes" class="tela">
+            <header>
+                <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>MOVIMENTAÇÕES</p>
+            </header>
+            <section>
+                    <header>
+                        <h1>Movimentações em Estoque</h1>
+                        <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Movimentação</button>
+                    </header>
+                    <div class="aba_cadastrar">
+                        <header>
+                            <h2>Cadastro de Movimentações</h2>
+                            <button class="fechar_cadastro"><span class="material-symbols-outlined">close_small</span>Fechar</button>
+                        </header>
+                        <section>
+                            <div>
+                                <div>
+                                    <label for="nome">Nome: </label>
+                                    <input type="text" name="nome" id="nome_produto">
+                                </div>
+                                
+
+                                <div>
+                                    <label for="total_estoque">Total Estoque: </label>
+                                    <input type="number" name="total_estoque" id="total_estoque">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div>
+                                    <label for="valor">valor: </label>
+                                    <input type="number" name="valor" id="valor">
+                                </div>
+
+                                <div>
+                                    <label for="categorias">Categoria: </label>
+                                    <select name="categorias" id="categorias">
+                                        <option value="" disabled selected>Selecione uma categoria</option>
+                                    </select>  
+                                </div>
+                            </div>
+
+                            
+                        </section>
+
+                        <footer>
+                            <button class="botao_salvar" id="cadastrar_salvar"><span class="material-symbols-outlined">save</span>Salvar</button>
+                            <button class="botao_voltar"><span class="material-symbols-outlined">arrow_back</span>Voltar</button>
+                        </footer>
+                </div>
+
+                    <nav>
+                        
+                        <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar movimentações...">
+
+                        <button class="botao_filtros">
+                                <span class="material-symbols-outlined">filter_alt</span>Filtros
+                        </button>
+                        
+                        <div class="cortina_filtros">
+                            <header><span class="material-symbols-outlined">filter_alt</span>Filtros</header>
+                            
+                            <section>
+                                
+                                <label for="categorias_filtro">Categoria: </label>
+                                <select name="categorias_filtro" id="categorias_filtro">
+                                    <option value="" disabled selected>Selecione uma categoria</option>
+                                </select>  
+                                
+
+                                
+                                <label for="preco_min">Preço Miníno: </label>
+                                <input type="number" name="preco_min" id="preco_min">
+                                
+
+                                
+                                <label for="preco_max">Preço Máximo: </label>
+                                <input type="number" name="preco_max" id="preco_max">
+                                
+
+                                
+                                <label for="Estoque_min">Estoque mínimo: </label>
+                                <input type="number" name="Estoque_min" id="Estoque_min">
+                                
+
+                                
+                                <label for="Estoque_max">Estoque Maximo: </label>
+                                <input type="number" name="Estoque_max" id="Estoque_max">
+                                
+                            </section>    
+
+                            <footer>
+                                <button class="botao_fechar">
+                                    Fechar
+                                </button>
+                                <button class="botao_aplicar" id="filtro_aplicar">
+                                    Aplicar
+                                </button>
+                            </footer>
+                                    
+                        </div>
+                        
+                    </nav>
+
+                    <div id="div_tabela">
+                        <table id="tabela">
+                    
+                        </table>
+                    </div>
+            </section>
+        </section>
+
+        <section id="produtos" class="tela">
+            <header>
+                <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>PRODUTOS</p>
+            </header>
+            <section>
+                    <header>
+                        <h1>Produtos em Estoque</h1>
+                        <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Produto</button>
+                    </header>
+                    <div class="aba_cadastrar">
+                        <header>
+                            <h2>Cadastro de Produtos</h2>
+                            <button class="fechar_cadastro"><span class="material-symbols-outlined">close_small</span>Fechar</button>
+                        </header>
+                        <section>
+                            <div>
+                                <div>
+                                    <label for="nome">Nome: </label>
+                                    <input type="text" name="nome" id="nome_produto">
+                                </div>
+                                
+
+                                <div>
+                                    <label for="total_estoque">Total Estoque: </label>
+                                    <input type="number" name="total_estoque" id="total_estoque">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div>
+                                    <label for="valor">valor: </label>
+                                    <input type="number" name="valor" id="valor">
+                                </div>
+
+                                <div>
+                                    <label for="categorias">Categoria: </label>
+                                    <select name="categorias" id="categorias">
+                                        <option value="" disabled selected>Selecione uma categoria</option>
+                                    </select>  
+                                </div>
+                            </div>
+
+                            
+                        </section>
+
+                        <footer>
+                            <button class="botao_salvar" id="cadastrar_salvar"><span class="material-symbols-outlined">save</span>Salvar</button>
+                            <button class="botao_voltar"><span class="material-symbols-outlined">arrow_back</span>Voltar</button>
+                        </footer>
+                </div>
+
+                    <nav>
+                        
+                        <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar produto...">
+
+                        <button class="botao_filtros">
+                                <span class="material-symbols-outlined">filter_alt</span>Filtros
+                        </button>
+                        
+                        <div class="cortina_filtros">
+                            <header><span class="material-symbols-outlined">filter_alt</span>Filtros</header>
+                            
+                            <section>
+                                
+                                <label for="categorias_filtro">Categoria: </label>
+                                <select name="categorias_filtro" id="categorias_filtro">
+                                    <option value="" disabled selected>Selecione uma categoria</option>
+                                </select>  
+                                
+
+                                
+                                <label for="preco_min">Preço Miníno: </label>
+                                <input type="number" name="preco_min" id="preco_min">
+                                
+
+                                
+                                <label for="preco_max">Preço Máximo: </label>
+                                <input type="number" name="preco_max" id="preco_max">
+                                
+
+                                
+                                <label for="Estoque_min">Estoque mínimo: </label>
+                                <input type="number" name="Estoque_min" id="Estoque_min">
+                                
+
+                                
+                                <label for="Estoque_max">Estoque Maximo: </label>
+                                <input type="number" name="Estoque_max" id="Estoque_max">
+                                
+                            </section>    
+
+                            <footer>
+                                <button class="botao_fechar">
+                                    Fechar
+                                </button>
+                                <button class="botao_aplicar" id="filtro_aplicar">
+                                    Aplicar
+                                </button>
+                            </footer>
+                                    
+                        </div>
+                        
+                    </nav>
+
+                    <div id="div_tabela">
+                        <table id="tabela">
+                    
+                        </table>
+                    </div>
+            </section>
+        </section>
+
+        <section id="produtos" class="tela">
+            <header>
+                <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>PRODUTOS</p>
+            </header>
+            <section>
+                    <header>
+                        <h1>Produtos em Estoque</h1>
+                        <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Produto</button>
+                    </header>
+                    <div class="aba_cadastrar">
+                        <header>
+                            <h2>Cadastro de Produtos</h2>
+                            <button class="fechar_cadastro"><span class="material-symbols-outlined">close_small</span>Fechar</button>
+                        </header>
+                        <section>
+                            <div>
+                                <div>
+                                    <label for="nome">Nome: </label>
+                                    <input type="text" name="nome" id="nome_produto">
+                                </div>
+                                
+
+                                <div>
+                                    <label for="total_estoque">Total Estoque: </label>
+                                    <input type="number" name="total_estoque" id="total_estoque">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div>
+                                    <label for="valor">valor: </label>
+                                    <input type="number" name="valor" id="valor">
+                                </div>
+
+                                <div>
+                                    <label for="categorias">Categoria: </label>
+                                    <select name="categorias" id="categorias">
+                                        <option value="" disabled selected>Selecione uma categoria</option>
+                                    </select>  
+                                </div>
+                            </div>
+
+                            
+                        </section>
+
+                        <footer>
+                            <button class="botao_salvar" id="cadastrar_salvar"><span class="material-symbols-outlined">save</span>Salvar</button>
+                            <button class="botao_voltar"><span class="material-symbols-outlined">arrow_back</span>Voltar</button>
+                        </footer>
+                </div>
+
+                    <nav>
+                        
+                        <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar produto...">
+
+                        <button class="botao_filtros">
+                                <span class="material-symbols-outlined">filter_alt</span>Filtros
+                        </button>
+                        
+                        <div class="cortina_filtros">
+                            <header><span class="material-symbols-outlined">filter_alt</span>Filtros</header>
+                            
+                            <section>
+                                
+                                <label for="categorias_filtro">Categoria: </label>
+                                <select name="categorias_filtro" id="categorias_filtro">
+                                    <option value="" disabled selected>Selecione uma categoria</option>
+                                </select>  
+                                
+
+                                
+                                <label for="preco_min">Preço Miníno: </label>
+                                <input type="number" name="preco_min" id="preco_min">
+                                
+
+                                
+                                <label for="preco_max">Preço Máximo: </label>
+                                <input type="number" name="preco_max" id="preco_max">
+                                
+
+                                
+                                <label for="Estoque_min">Estoque mínimo: </label>
+                                <input type="number" name="Estoque_min" id="Estoque_min">
+                                
+
+                                
+                                <label for="Estoque_max">Estoque Maximo: </label>
+                                <input type="number" name="Estoque_max" id="Estoque_max">
+                                
+                            </section>    
+
+                            <footer>
+                                <button class="botao_fechar">
+                                    Fechar
+                                </button>
+                                <button class="botao_aplicar" id="filtro_aplicar">
+                                    Aplicar
+                                </button>
+                            </footer>
+                                    
+                        </div>
+                        
+                    </nav>
+
+                    <div id="div_tabela">
+                        <table id="tabela">
+                    
+                        </table>
+                    </div>
+            </section>
+        </section>
+
+        
 
     </main>
 
