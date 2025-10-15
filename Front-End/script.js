@@ -53,7 +53,7 @@ async function adicionar_dados(nome_tabela, dados){
     return await res.json(); // retorna o JSON do back-end
 }
 
-async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=false, letras='', filtros='') { 
+async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=false, letras='', filtros='', colunaPesquisa='nome') { 
     try { 
         let response;
         let dados;
@@ -61,7 +61,7 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
         if (atributo) { 
             response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`);
         } else { 
-            response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}`);
+            response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}`);
         }
 
         // Verifica se o servidor respondeu corretamente
@@ -257,7 +257,8 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
     })
 };
 
-                                            
+let nome_tabela_atual = '';           
+
 
 
 const botao_estoque = document.getElementById('botao_estoque');
@@ -273,23 +274,25 @@ const telas = document.querySelectorAll('.tela');
 
 abas.forEach(aba => {
   aba.addEventListener('click', async () => {
-    const nome = aba.getAttribute('data-tabela').toLowerCase();
+    nome_tabela_atual = aba.getAttribute('data-tabela').toLowerCase();
 
     // esconde todas as telas
     telas.forEach(tela => tela.classList.remove('ativa'));
 
     // mostra só a selecionada
-    document.getElementById(nome).classList.add('ativa');
-    await atualizar_tabela(nome);
-  });
-});
+    document.getElementById(nome_tabela_atual).classList.add('ativa');
+
+    await atualizar_tabela(nome_tabela_atual);
 
 
-const inputpesquisa = document.getElementById('pesquisa');
 
-inputpesquisa.addEventListener('keydown', async (e) => { 
-    if (e.key === 'Enter') {
-        const atributo = await pegar_dados('Produtos', true);
+    const inputpesquisa = document.getElementById(`pesquisa_${nome_tabela_atual}`);
+
+    inputpesquisa.onkeydown = async (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // previne efeito do Enter
+        inputpesquisa.blur();
+
         // Verifica campo vazio
         if (inputpesquisa.value.trim() === "") {
             Swal.fire({
@@ -301,8 +304,15 @@ inputpesquisa.addEventListener('keydown', async (e) => {
             return; // impede que continue a execução
         }
 
+        let colunaPesquisa = 'nome'
+
+        if (nome_tabela_atual === 'movimentacoes') {
+
+            colunaPesquisa = 'produto_id'; 
+        }
+
         // Busca dados filtrados
-        const dados = await pegar_dados('Produtos', false, false, inputpesquisa.value);
+        const dados = await pegar_dados(nome_tabela_atual, false, false, inputpesquisa.value, false, colunaPesquisa);
 
         // Nenhum dado encontrado
         if (!dados || dados.length === 0){
@@ -317,88 +327,128 @@ inputpesquisa.addEventListener('keydown', async (e) => {
         }
 
         
-        await atualizar_tabela('Produtos', dados);
-    }
-});
+        await atualizar_tabela(nome_tabela_atual, dados);
+      }
+    };
 
-// Usa o evento 'input' para disparar a cada mudança no campo
-inputpesquisa.addEventListener('input', async () => {
-    const valorPesquisa = inputpesquisa.value.trim();
+    inputpesquisa.oninput = async () => {
+        const valorPesquisa = inputpesquisa.value.trim();
 
-    if (valorPesquisa === "") {
-        // Opcional: atualizar tabela com todos os produtos ou limpar
-        const todosProdutos = await pegar_dados('Produtos', false);
-        await atualizar_tabela('Produtos', todosProdutos);
-        return;
-    }
+        if (valorPesquisa === "") {
+            // Opcional: atualizar tabela com todos os produtos ou limpar
+            const todosProdutos = await pegar_dados(nome_tabela_atual, false);
+            await atualizar_tabela(nome_tabela_atual, todosProdutos);
+            return;
+        }
 
-    // Busca dados filtrados
-    const dados = await pegar_dados('Produtos', false, false, valorPesquisa);
+        let colunaPesquisa = 'nome'
 
-    // Atualiza tabela com os resultados
-    await atualizar_tabela('Produtos', dados);
-});
+            if (nome_tabela_atual === 'movimentacoes') {
 
+                colunaPesquisa = 'produto_id'; 
+        }
 
+        const dados = await pegar_dados(nome_tabela_atual, false, false, valorPesquisa, false, colunaPesquisa);
 
-
-
-
-
-/* Filtro*/ 
-
-const botao_filtros = document.querySelector('.botao_filtros')
-const cortina_filtros = document.querySelector('.cortina_filtros')
-const botao_fechar_filtro = document.querySelector('.botao_fechar')
-
-botao_filtros.addEventListener('click', () => {
-    cortina_filtros.style.display = 'grid';
-    botao_filtros.style.display = 'none';
-    
-})
-
-botao_fechar_filtro.addEventListener('click', () => { 
-    cortina_filtros.style.display = 'none';
-    botao_filtros.style.display = 'flex';
-
-})
+        // Atualiza tabela com os resultados
+        await atualizar_tabela(nome_tabela_atual, dados);
+    };
 
 
-const preco_min = document.getElementById('preco_min')
-const preco_max = document.getElementById('preco_max')
-const Estoque_min = document.getElementById('Estoque_min')
-const Estoque_max = document.getElementById('Estoque_max')
+    /* Filtro*/ 
 
-const categorias_filtro = document.getElementById('categorias_filtro')
+    const botao_filtros = document.querySelector(`#${nome_tabela_atual} .botao_filtros`)
+    const cortina_filtros = document.querySelector(`#${nome_tabela_atual} .cortina_filtros`)
+    const botao_fechar_filtro = document.querySelector(`#${nome_tabela_atual} .botao_fechar`)
 
-pegar_dados('categorias')
-    .then(dados => {
-        dados.forEach(linha => {
-            const option = document.createElement('option');
-            option.value = linha[0]
-            option.textContent = linha[1]; 
-            categorias_filtro.appendChild(option);
+    botao_filtros.addEventListener('click', () => {
+        cortina_filtros.style.display = 'grid';
+        botao_filtros.style.display = 'none';
+        const valores_inputs = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros input`);
+
+
+        const filtros = {};
+        valores_inputs.forEach(input => {
+            if(input.value.trim() !== '') {
+                filtros[input.name] = input.value.trim();
+            }
+        });
+
+
+        const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`)
+
+        selecionar.forEach(campos => {
+            campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+
+            pegar_dados(campos.name)
+            .then(dados => {
+                dados.forEach(linha => {
+                    const option = document.createElement('option');
+                    option.value = linha[0]
+                    option.textContent = linha[1]; 
+                    campos.appendChild(option);
+                });
+            });
+
+            if (campos.value) {
+                filtros[campos.name] = campos.value;
+            }
+        });
+
+        const filtro_aplicar = document.getElementById(`filtro_aplicar_${nome_tabela_atual}`)
+
+
+        filtro_aplicar.addEventListener('click', async () => {
+        const filtros_atualizados = {};
+
+        // Captura inputs
+        valores_inputs.forEach(input => {
+            if (input.value.trim() !== '') {
+                filtros_atualizados[input.name] = input.value.trim();
+            }
+        });
+
+        // Captura selects
+        selecionar.forEach(campos => {
+            if (campos.value) {
+                filtros_atualizados[campos.name] = campos.value;
+            }
+        });
+
+        // Cria query string
+        const params = new URLSearchParams(filtros_atualizados).toString();
+
+        // Chama o backend
+        const dados = await pegar_dados(nome_tabela_atual, false, false, '', params);
+
+        await atualizar_tabela(nome_tabela_atual, dados);
     });
-})
+        
+    })
 
-const filtro_aplicar = document.getElementById('filtro_aplicar')
+    botao_fechar_filtro.addEventListener('click', () => { 
+        cortina_filtros.style.display = 'none';
+        botao_filtros.style.display = 'flex';
 
-filtro_aplicar.addEventListener('click', async () => {
+    })
 
-    const params = new URLSearchParams({
-        preco_min: preco_min.value.trim(),
-        preco_max: preco_max.value.trim(),
-        estoque_min: Estoque_min.value.trim(),
-        estoque_max: Estoque_max.value.trim(),
-        categorias_filtro: categorias_filtro.value
-    }).toString()
+    
 
 
-    const dados = await pegar_dados('Produtos', false, false, '', params)  
+    
 
-    await atualizar_tabela('Produtos', dados)
+    
+  });
+}); 
 
-})
+
+
+
+
+
+
+    
+
 
 
 

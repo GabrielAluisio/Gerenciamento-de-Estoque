@@ -95,7 +95,7 @@
 
                     <nav>
                         
-                        <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar produto...">
+                        <input type="text" id="pesquisa_produtos" class="pesquisa" placeholder="Procurar produto...">
 
                         <button class="botao_filtros">
                                 <span class="material-symbols-outlined">filter_alt</span>Filtros
@@ -106,8 +106,8 @@
                             
                             <section>
                                 
-                                <label for="categorias_filtro">Categoria: </label>
-                                <select name="categorias_filtro" id="categorias_filtro">
+                                <label for="categorias">Categoria: </label>
+                                <select name="categorias" id="categorias">
                                     <option value="" disabled selected>Selecione uma categoria</option>
                                 </select>  
                                 
@@ -123,13 +123,13 @@
                                 
 
                                 
-                                <label for="Estoque_min">Estoque mínimo: </label>
-                                <input type="number" name="Estoque_min" id="Estoque_min">
+                                <label for="estoque_min">Estoque mínimo: </label>
+                                <input type="number" name="estoque_min" id="estoque_min">
                                 
 
                                 
-                                <label for="Estoque_max">Estoque Maximo: </label>
-                                <input type="number" name="Estoque_max" id="Estoque_max">
+                                <label for="estoque_max">Estoque Maximo: </label>
+                                <input type="number" name="estoque_max" id="estoque_max">
                                 
                             </section>    
 
@@ -137,7 +137,7 @@
                                 <button class="botao_fechar">
                                     Fechar
                                 </button>
-                                <button class="botao_aplicar" id="filtro_aplicar">
+                                <button class="botao_aplicar" id="filtro_aplicar_produtos">
                                     Aplicar
                                 </button>
                             </footer>
@@ -207,7 +207,7 @@
 
                     <nav>
                         
-                        <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar movimentações...">
+                        <input type="text" id="pesquisa_movimentacoes" class="pesquisa" placeholder="Procurar movimentação pelo produto_id...">
 
                         <button class="botao_filtros">
                                 <span class="material-symbols-outlined">filter_alt</span>Filtros
@@ -218,30 +218,29 @@
                             
                             <section>
                                 
-                                <label for="categorias_filtro">Categoria: </label>
-                                <select name="categorias_filtro" id="categorias_filtro">
+                                <label for="tipos_movimentacoes">Tipo_movimentacao: </label>
+                                <select name="tipos_movimentacoes" id="tipos_movimentacoes">
                                     <option value="" disabled selected>Selecione uma categoria</option>
                                 </select>  
                                 
 
                                 
-                                <label for="preco_min">Preço Miníno: </label>
-                                <input type="number" name="preco_min" id="preco_min">
+                                <label for="quantidade_min">Quantidade Miníno: </label>
+                                <input type="number" name="quantidade_min" id="quantidade_min">
                                 
 
                                 
-                                <label for="preco_max">Preço Máximo: </label>
-                                <input type="number" name="preco_max" id="preco_max">
+                                <label for="quantidade_max">Quantidade Máximo: </label>
+                                <input type="number" name="quantidade_max" id="quantidade_max">
                                 
 
                                 
-                                <label for="Estoque_min">Estoque mínimo: </label>
-                                <input type="number" name="Estoque_min" id="Estoque_min">
-                                
+                                <label for="data_inicio">A partir de:</label>
+                                <input type="datetime-local" id="data_inicio" name="data_inicio">
 
-                                
-                                <label for="Estoque_max">Estoque Maximo: </label>
-                                <input type="number" name="Estoque_max" id="Estoque_max">
+                                <label for="data_fim">Até:</label>
+                                <input type="datetime-local" id="data_fim" name="data_fim">
+
                                 
                             </section>    
 
@@ -249,7 +248,7 @@
                                 <button class="botao_fechar">
                                     Fechar
                                 </button>
-                                <button class="botao_aplicar" id="filtro_aplicar">
+                                <button class="botao_aplicar" id="filtro_aplicar_movimentacoes">
                                     Aplicar
                                 </button>
                             </footer>
@@ -266,7 +265,7 @@
             </section>
         </section>
 
-        <section id="produtos" class="tela">
+        <section id="produtos_teste" class="tela">
             <header>
                 <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>PRODUTOS</p>
             </header>
@@ -378,7 +377,7 @@
             </section>
         </section>
 
-        <section id="produtos" class="tela">
+        <section id="produtos_teste" class="tela">
             <header>
                 <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>PRODUTOS</p>
             </header>

@@ -54,53 +54,92 @@ def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colu
 '''
 @app.route("/<nome_tabela>", methods=["GET"])
 def pegar_coluna(nome_tabela):
+
     apagados = request.args.get("apagados", "true").lower() == "true"
+
     letras = request.args.get("letras") 
-    preco_min = request.args.get("preco_min")
-    preco_max = request.args.get("preco_max")
-    estoque_min = request.args.get("estoque_min")
-    estoque_max = request.args.get("estoque_max")
-    categorias_filtro = request.args.get("categorias_filtro")
+
+    coluna_pesquisa = request.args.get("pesquisa", "nome")
+
+    filtros_get = request.args.to_dict()
+
+    
+
 
     conn = conectar()
     cursor = conn.cursor()
 
     
     filtros = []
-    query_base = f"SELECT * FROM {nome_tabela}"
+    query_base = f"SELECT * FROM {nome_tabela} "
 
-    if nome_tabela == ("produtos" or "Produtos"):
+    if nome_tabela.lower() == "produtos":
+
+        preco_min = filtros_get.get("preco_min")
+        preco_max = filtros_get.get("preco_max")
+        estoque_min = filtros_get.get("estoque_min")
+        estoque_max = filtros_get.get("estoque_max")
+        categoria = filtros_get.get("categorias")
+
         if apagados:      
             filtros.append("ativo = 0")
         else:
             query_base = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela}"
             filtros.append("ativo = 1")
+    
+        print(filtros_get)
 
-    if preco_min:
-        filtros.append(f"valor >= {preco_min}")
+        if preco_min:
+            filtros.append(f"valor >= {float(preco_min)}")
+        if preco_max:
+            filtros.append(f"valor <= {float(preco_max)}")
+        if estoque_min:
+            filtros.append(f"total_estoque >= {int(estoque_min)}")
+        if estoque_max:
+            filtros.append(f"total_estoque <= {int(estoque_max)}")
+        if categoria:
+            filtros.append(f"categoria_id = {categoria}")
+                
+        
 
-    if preco_max:
-        filtros.append(f"valor <= {preco_max}")
+    elif nome_tabela.lower() == "movimentacoes":
 
-    if estoque_min:
-        filtros.append(f"total_estoque >= {estoque_min}")
+        tipo = filtros_get.get("tipos_movimentacoes")
+        quantidade_min = filtros_get.get("quantidade_min")
+        quantidade_max = filtros_get.get("quantidade_max")
+        data_min = filtros_get.get("data_inicio")
+        data_max = filtros_get.get("data_fim")
 
-    if estoque_max:
-        filtros.append(f"total_estoque <= {estoque_max}")
+        # Tipo (1=entrada, 2=saída)
+        if tipo:
+            filtros.append(f"tipo_movimentacao_id = {int(tipo)}")
 
-    if categorias_filtro:
-        filtros.append(f" categoria_id = {categorias_filtro}")
+        # Quantidades
+        if quantidade_min:
+            filtros.append(f"quantidade >= {int(quantidade_min)}")
+        if quantidade_max:
+            filtros.append(f"quantidade <= {int(quantidade_max)}")
 
-    if letras:  # só adiciona se houver pesquisa
-        filtros.append(f"nome LIKE '%{letras}%'")
+        # Datas
+        if data_min and data_max:
+            filtros.append(f"data_movimentacao BETWEEN '{data_min}' AND '{data_max}'")
+        elif data_min:
+            filtros.append(f"data_movimentacao >= '{data_min}'")
+        elif data_max:
+            filtros.append(f"data_movimentacao <= '{data_max}'")
+
+    if letras:
+        filtros.append(f"{coluna_pesquisa} LIKE '%{letras}%'") 
 
     if filtros:
         query_base += " WHERE " + " AND ".join(filtros)
 
-    query_base += " order by id "
+    query_base += " ORDER BY id"
 
     cursor.execute(query_base)
     result = cursor.fetchall()
+    print(query_base)
+    print('----------')
     print(result)
 
     novo_result = []
