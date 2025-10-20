@@ -2,13 +2,13 @@
 
 
 async function desativar(nome_tabela, id){
-    fetch(`http://127.0.0.1:5000/${nome_tabela}/Desativar/${id}`, {
+    fetch(`http://127.0.0.1:5000/${nome_tabela}/desativar/${id}`, {
         method: 'PATCH'
     })
 
     .then(async response => {
         if (response.ok) {  // checa se deu sucesso (status 200)
-            await atualizar_tabela('Produtos');
+            await atualizar_tabela(nome_tabela);
         } else {
             console.error("Erro ao desativar o produto");
         }
@@ -174,13 +174,21 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
 
         editar.addEventListener('click', () => {
             const tds = tr.querySelectorAll('td');
-            const ths = Array.from(document.querySelectorAll('#tabela thead tr th')).slice(1);
+            const ths = Array.from(document.querySelectorAll(`#${nome_tabela} #tabela thead tr th`)).slice(1);
 
             // transforma todos em input e guarda valor original e atributo
             tds.forEach((td, i) => {
+                const atributo = ths[i] ? ths[i].textContent : `coluna${i}`;
                 td.dataset.valorOriginal = td.textContent;
-                td.dataset.atributo = ths[i] ? ths[i].textContent : `coluna${i}`;
-                td.innerHTML = `<input type="text" value="${td.textContent}">`;
+                td.dataset.atributo = atributo;
+
+                if (atributo.toLowerCase().includes('data')) {
+                    // Converte o valor original para o formato YYYY-MM-DDTHH:MM
+                    const valor = new Date(td.textContent).toISOString().slice(0,16);
+                    td.innerHTML = `<input type="datetime-local" value="${valor}">`;
+                } else {
+                    td.innerHTML = `<input type="text" value="${td.textContent}">`;
+                }
             });
 
             div.innerHTML = '';
@@ -208,7 +216,7 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
                 });
 
                 if (result.isConfirmed) {
-                    tds.forEach(async td => {
+                    for (const td of tds) {
                         const input = td.querySelector('input');
                         const novoValor = input.value.trim();
                         const valorOriginal = td.dataset.valorOriginal;
@@ -222,10 +230,11 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
                         if (novoValor !== valorOriginal) {
                             await atualizar(nome_tabela, atributo, novoValor, id);
                         }
-                    });
+                    }
 
-                    await atualizar_tabela(nome_tabela)
-                }
+                    // Só aqui, depois de atualizar todos os campos, atualiza a tabela
+                    await atualizar_tabela(nome_tabela);
+}
             });
             
 

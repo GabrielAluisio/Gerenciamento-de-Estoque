@@ -224,11 +224,11 @@ def adicionar_produto(nome_tabela):
 
 
 
-@app.route('/<nome_tabela>/Desativar/<int:id>', methods=['PATCH'])
+@app.route('/<nome_tabela>/desativar/<int:id>', methods=['PATCH'])
 def desativarProduto(nome_tabela, id):
 
-    if nome_tabela == 'Produtos':
-        query = f" UPDATE Produtos set ativo = 0 WHERE id = {'%s'}; "
+    if nome_tabela == 'produtos':
+        query = f" UPDATE {nome_tabela} set ativo = 0 WHERE id = {'%s'}; "
 
     conn = conectar()
     cursor = conn.cursor()
