@@ -159,8 +159,10 @@ def mostrar_atributos(nome_tabela, back=False, incluir_id=True, incluir_ativo=Tr
 def adicionar_produto(nome_tabela):
     dados = request.get_json()
 
+
     try:
-    
+        nome_tabela = nome_tabela.lower() 
+
         valores = list(dados.values())
         
         conn = conectar()

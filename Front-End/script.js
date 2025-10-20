@@ -535,7 +535,7 @@ botao_salvar.addEventListener('click', async () => {
 
         // Se o usuário confirmar
         if (result.isConfirmed) {
-            const resposta = await adicionar_dados('Produtos', {
+            const resposta = await adicionar_dados('produtos', {
                 nome,
                 total_estoque,
                 valor,
