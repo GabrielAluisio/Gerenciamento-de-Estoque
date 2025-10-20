@@ -12,46 +12,18 @@ app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
-senha = os.getenv("senha_do_bd") 
+
 
 def conectar():
     return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password=senha,
-        database='PI'
+        host=os.getenv("DB_HOST"),      
+        user=os.getenv("DB_USER"),      
+        password=os.getenv("DB_PASS"),  
+        database=os.getenv("DB_NAME"),
+        port=3306 
     )
 
-'''
-def mostrar_tabela_print(nome_table, todas_as_colunas=True, onde_comecar_as_colunas=0):
 
-    comando.execute(f"SELECT * FROM {nome_table};", )
-    result = comando.fetchall()
-
-    for i in result:
-
-        if todas_as_colunas == True:
-        
-            for r in range(onde_comecar_as_colunas, len(i)):
-                if r >= len(i) - 1:
-                    print(i[r], end="")
-                else:
-                    print(i[r], end=" - ")
-
-            print(end="\n")
-
-        # Define o números de colunas
-        else:
-
-            for r in range(onde_comecar_as_colunas, todas_as_colunas):
-                if r >= todas_as_colunas - 1:
-                    print(i[r], end="")
-                else:
-                    print(i[r], end=" - ")
-
-            print(end="\n")
-
-'''
 @app.route("/<nome_tabela>", methods=["GET"])
 def pegar_coluna(nome_tabela):
 
@@ -269,16 +241,5 @@ def atualizar_dados(nome_tabela):
         return jsonify({"erro": str(e)}), 500  
     
 
-'''
-def excluir_dados(nome_tabela, id):
-
-    if nome_tabela == 'Produtos':
-        atualizar_dados('Produtos', 'ativo', 0, id)
-
-    else:
-        comando.execute(f"""DELETE FROM {nome_tabela} WHERE id = {id};"""),
-
-    conn.commit(  '''
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
