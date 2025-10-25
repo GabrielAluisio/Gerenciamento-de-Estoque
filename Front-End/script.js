@@ -282,172 +282,268 @@ const abas = document.querySelectorAll('#sub_menu_estoque li');
 const telas = document.querySelectorAll('.tela');
 
 abas.forEach(aba => {
-  aba.addEventListener('click', async () => {
-    nome_tabela_atual = aba.getAttribute('data-tabela').toLowerCase();
+    aba.addEventListener('click', async () => {
+        nome_tabela_atual = aba.getAttribute('data-tabela').toLowerCase();
 
-    // esconde todas as telas
-    telas.forEach(tela => tela.classList.remove('ativa'));
+        // esconde todas as telas
+        telas.forEach(tela => tela.classList.remove('ativa'));
 
-    // mostra só a selecionada
-    document.getElementById(nome_tabela_atual).classList.add('ativa');
+        // mostra só a selecionada
+        document.getElementById(nome_tabela_atual).classList.add('ativa');
 
-    await atualizar_tabela(nome_tabela_atual);
+        await atualizar_tabela(nome_tabela_atual);
 
 
 
-    const inputpesquisa = document.getElementById(`pesquisa_${nome_tabela_atual}`);
+        const inputpesquisa = document.getElementById(`pesquisa_${nome_tabela_atual}`);
 
-    inputpesquisa.onkeydown = async (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // previne efeito do Enter
-        inputpesquisa.blur();
+        inputpesquisa.onkeydown = async (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // previne efeito do Enter
+            inputpesquisa.blur();
 
-        // Verifica campo vazio
-        if (inputpesquisa.value.trim() === "") {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Campo vazio!',
-                text: 'Digite algo para pesquisar.',
-                confirmButtonColor: '#007bff',
-            });
-            return; // impede que continue a execução
-        }
+            // Verifica campo vazio
+            if (inputpesquisa.value.trim() === "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campo vazio!',
+                    text: 'Digite algo para pesquisar.',
+                    confirmButtonColor: '#007bff',
+                });
+                return; // impede que continue a execução
+            }
 
-        let colunaPesquisa = 'nome'
-
-        if (nome_tabela_atual === 'movimentacoes') {
-
-            colunaPesquisa = 'produto_id'; 
-        }
-
-        // Busca dados filtrados
-        const dados = await pegar_dados(nome_tabela_atual, false, false, inputpesquisa.value, false, colunaPesquisa);
-
-        // Nenhum dado encontrado
-        if (!dados || dados.length === 0){
-            Swal.fire({
-                icon: 'info',
-                iconColor: '#ff934aff',
-                title: 'Nenhum dado encontrado',
-                text: `Não foram encontrados produtos com "${inputpesquisa.value}".`,
-                confirmButtonColor: '#007bff',
-            });
-            return; // para aqui, não atualiza a tabela
-        }
-
-        
-        await atualizar_tabela(nome_tabela_atual, dados);
-      }
-    };
-
-    inputpesquisa.oninput = async () => {
-        const valorPesquisa = inputpesquisa.value.trim();
-
-        if (valorPesquisa === "") {
-            // Opcional: atualizar tabela com todos os produtos ou limpar
-            const todosProdutos = await pegar_dados(nome_tabela_atual, false);
-            await atualizar_tabela(nome_tabela_atual, todosProdutos);
-            return;
-        }
-
-        let colunaPesquisa = 'nome'
+            let colunaPesquisa = 'nome'
 
             if (nome_tabela_atual === 'movimentacoes') {
 
                 colunaPesquisa = 'produto_id'; 
-        }
-
-        const dados = await pegar_dados(nome_tabela_atual, false, false, valorPesquisa, false, colunaPesquisa);
-
-        // Atualiza tabela com os resultados
-        await atualizar_tabela(nome_tabela_atual, dados);
-    };
-
-
-    /* Filtro*/ 
-
-    const botao_filtros = document.querySelector(`#${nome_tabela_atual} .botao_filtros`)
-    const cortina_filtros = document.querySelector(`#${nome_tabela_atual} .cortina_filtros`)
-    const botao_fechar_filtro = document.querySelector(`#${nome_tabela_atual} .botao_fechar`)
-
-    botao_filtros.addEventListener('click', () => {
-        cortina_filtros.style.display = 'grid';
-        botao_filtros.style.display = 'none';
-        const valores_inputs = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros input`);
-
-
-        const filtros = {};
-        valores_inputs.forEach(input => {
-            if(input.value.trim() !== '') {
-                filtros[input.name] = input.value.trim();
             }
-        });
 
+            // Busca dados filtrados
+            const dados = await pegar_dados(nome_tabela_atual, false, false, inputpesquisa.value, false, colunaPesquisa);
 
-        const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`)
-
-        selecionar.forEach(campos => {
-            campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
-
-            pegar_dados(campos.name)
-            .then(dados => {
-                dados.forEach(linha => {
-                    const option = document.createElement('option');
-                    option.value = linha[0]
-                    option.textContent = linha[1]; 
-                    campos.appendChild(option);
+            // Nenhum dado encontrado
+            if (!dados || dados.length === 0){
+                Swal.fire({
+                    icon: 'info',
+                    iconColor: '#ff934aff',
+                    title: 'Nenhum dado encontrado',
+                    text: `Não foram encontrados produtos com "${inputpesquisa.value}".`,
+                    confirmButtonColor: '#007bff',
                 });
+                return; // para aqui, não atualiza a tabela
+            }
+
+            
+            await atualizar_tabela(nome_tabela_atual, dados);
+        }
+        };
+
+        inputpesquisa.oninput = async () => {
+            const valorPesquisa = inputpesquisa.value.trim();
+
+            if (valorPesquisa === "") {
+                // Opcional: atualizar tabela com todos os produtos ou limpar
+                const todosProdutos = await pegar_dados(nome_tabela_atual, false);
+                await atualizar_tabela(nome_tabela_atual, todosProdutos);
+                return;
+            }
+
+            let colunaPesquisa = 'nome'
+
+                if (nome_tabela_atual === 'movimentacoes') {
+
+                    colunaPesquisa = 'produto_id'; 
+            }
+
+            const dados = await pegar_dados(nome_tabela_atual, false, false, valorPesquisa, false, colunaPesquisa);
+
+            // Atualiza tabela com os resultados
+            await atualizar_tabela(nome_tabela_atual, dados);
+        };
+
+
+        /* Filtro*/ 
+
+        const botao_filtros = document.querySelector(`#${nome_tabela_atual} .botao_filtros`)
+        const cortina_filtros = document.querySelector(`#${nome_tabela_atual} .cortina_filtros`)
+        const botao_fechar_filtro = document.querySelector(`#${nome_tabela_atual} .botao_fechar`)
+
+        botao_filtros.addEventListener('click', () => {
+            cortina_filtros.style.display = 'grid';
+            botao_filtros.style.display = 'none';
+            const valores_inputs = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros input`);
+
+
+            const filtros = {};
+            valores_inputs.forEach(input => {
+                if(input.value.trim() !== '') {
+                    filtros[input.name] = input.value.trim();
+                }
             });
 
-            if (campos.value) {
-                filtros[campos.name] = campos.value;
+
+            const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`)
+
+            selecionar.forEach(campos => {
+                campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+
+                pegar_dados(campos.name)
+                .then(dados => {
+                    dados.forEach(linha => {
+                        const option = document.createElement('option');
+                        option.value = linha[0]
+                        option.textContent = linha[1]; 
+                        campos.appendChild(option);
+                    });
+                });
+
+                if (campos.value) {
+                    filtros[campos.name] = campos.value;
+                }
+            });
+
+            const filtro_aplicar = document.getElementById(`filtro_aplicar_${nome_tabela_atual}`)
+
+
+            filtro_aplicar.addEventListener('click', async () => {
+                const filtros_atualizados = {};
+
+                // Captura inputs
+                valores_inputs.forEach(input => {
+                    if (input.value.trim() !== '') {
+                        filtros_atualizados[input.name] = input.value.trim();
+                    }
+                });
+
+                // Captura selects
+                selecionar.forEach(campos => {
+                    if (campos.value) {
+                        filtros_atualizados[campos.name] = campos.value;
+                    }
+                });
+
+                // Cria query string
+                const params = new URLSearchParams(filtros_atualizados).toString();
+
+                // Chama o backend
+                const dados = await pegar_dados(nome_tabela_atual, false, false, '', params);
+
+                await atualizar_tabela(nome_tabela_atual, dados);
+            });
+            
+        })
+
+        botao_fechar_filtro.addEventListener('click', () => { 
+            cortina_filtros.style.display = 'none';
+            botao_filtros.style.display = 'flex';
+
+        })
+
+        /* Cadastrar Produto */
+
+
+        const exibir_cadastro = document.querySelector(`#${nome_tabela_atual} .exibir_cadastro`)
+
+        const aba_cadastrar = document.querySelector(`#${nome_tabela_atual} .aba_cadastrar`)
+
+        const botao_fechar_cadastro = document.querySelector(`#${nome_tabela_atual} .fechar_cadastro`)
+        const botao_voltar_cadastro = document.querySelector(`#${nome_tabela_atual} .botao_voltar`)
+
+        exibir_cadastro.addEventListener('click', () => {
+            aba_cadastrar.style.display = 'flex';
+
+
+            const selects = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar select`)
+
+            selects.forEach(campos => {
+                campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+
+                pegar_dados(campos.name)
+                .then(dados => {
+                    dados.forEach(linha => {
+                        
+                        const option = document.createElement('option');
+                        option.value = linha[0]
+                        option.textContent = linha[1]; 
+                        campos.appendChild(option);
+                    });
+                });
+            });
+        })
+
+        /* Salvar Cadastro */ 
+
+        const botao_salvar = document.querySelector(`#${nome_tabela_atual} .aba_cadastrar .botao_salvar`)
+
+        botao_salvar.addEventListener('click', async () => {
+            const cadastro_atualizado = {};
+
+            const cadastrado_inputs = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar input`);
+
+            cadastrado_inputs.forEach(input => {
+                if(input.value.trim() !== '') {
+                    cadastro_atualizado[input.id] = input.value.trim();
+                } else {
+                    Swal.fire('Erro', 'Por favor, preencha todos os campos!', 'error');
+                    return;
+                }
+            });
+
+            const selects = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar select`);
+
+            // Captura selects
+            selects.forEach(campos => {
+                if (campos.value) {
+                    cadastro_atualizado[campos.id] = campos.value;
+                }
+            });
+            
+            
+
+            try {
+                // Alerta de confirmação antes de cadastrar
+                const result = await Swal.fire({
+                    title: 'Cadastrar produto',
+                    text: 'Tem certeza que deseja cadastrar este item?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745', // verde
+                    cancelButtonColor: '#6c757d', // cinza
+                    confirmButtonText: 'Sim, cadastrar',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                });
+
+                // Se o usuário confirmar
+                if (result.isConfirmed) {
+                    const resposta = await adicionar_dados(nome_tabela_atual, cadastro_atualizado);
+
+                    if (resposta.sucesso) {
+                        Swal.fire('Sucesso', 'Item cadastrado com sucesso!', 'success');
+                        aba_cadastrar.style.display = 'none';
+                        await atualizar_tabela(nome_tabela_atual);
+                    } else {
+                        Swal.fire('Erro', resposta.mensagem, 'error');
+                    }
+                }
+
+            } catch (erro) {
+                console.error(erro);
+                Swal.fire('Erro', 'Não foi possível conectar ao servidor!', 'error');
             }
         });
 
-        const filtro_aplicar = document.getElementById(`filtro_aplicar_${nome_tabela_atual}`)
+        botao_fechar_cadastro.addEventListener('click', () => {
+            aba_cadastrar.style.display = 'none';
+        })
 
+        botao_voltar_cadastro.addEventListener('click', () => {
+            aba_cadastrar.style.display = 'none';
+        })
 
-        filtro_aplicar.addEventListener('click', async () => {
-        const filtros_atualizados = {};
-
-        // Captura inputs
-        valores_inputs.forEach(input => {
-            if (input.value.trim() !== '') {
-                filtros_atualizados[input.name] = input.value.trim();
-            }
-        });
-
-        // Captura selects
-        selecionar.forEach(campos => {
-            if (campos.value) {
-                filtros_atualizados[campos.name] = campos.value;
-            }
-        });
-
-        // Cria query string
-        const params = new URLSearchParams(filtros_atualizados).toString();
-
-        // Chama o backend
-        const dados = await pegar_dados(nome_tabela_atual, false, false, '', params);
-
-        await atualizar_tabela(nome_tabela_atual, dados);
     });
-        
-    })
-
-    botao_fechar_filtro.addEventListener('click', () => { 
-        cortina_filtros.style.display = 'none';
-        botao_filtros.style.display = 'flex';
-
-    })
-
-    
-
-
-    
-
-    
-  });
 }); 
 
 
@@ -462,99 +558,10 @@ abas.forEach(aba => {
 
 
 
-/* Cadastrar Produto */
-
-
-const exibir_cadastro = document.querySelector('.exibir_cadastro')
-
-const aba_cadastrar = document.querySelector('.aba_cadastrar')
-
-const botao_fechar_cadastro = document.querySelector('.fechar_cadastro')
-const botao_voltar_cadastro = document.querySelector('.botao_voltar')
-
-exibir_cadastro.addEventListener('click', () => {
-    aba_cadastrar.style.display = 'flex';
-
-})
-
-botao_fechar_cadastro.addEventListener('click', () => {
-    aba_cadastrar.style.display = 'none';
-})
-
-botao_voltar_cadastro.addEventListener('click', () => {
-    aba_cadastrar.style.display = 'none';
-})
-
-
-const categoria = document.getElementById('categorias')
-
-pegar_dados('categorias')
-    .then(dados => {
-        dados.forEach(linha => {
-            const option = document.createElement('option');
-            option.value = linha[0]
-            option.textContent = linha[1]; 
-            categoria.appendChild(option);
-    });
-})
 
 
 
 
 
-
-/* Salvar Cadastro */ 
-
-const botao_salvar = document.getElementById('cadastrar_salvar');
-
-botao_salvar.addEventListener('click', async () => {
-    const nome = document.getElementById('nome_produto').value;
-    const total_estoque = document.getElementById('total_estoque').value;
-    const valor = document.getElementById('valor').value;
-    const categoria_selecionada = categoria.value;
-
-    // Validação simples
-    if (!nome || !total_estoque || !valor || !categoria_selecionada) {
-        Swal.fire('Erro', 'Por favor, preencha todos os campos!', 'error');
-        return;
-    }
-
-    try {
-        // Alerta de confirmação antes de cadastrar
-        const result = await Swal.fire({
-            title: 'Cadastrar produto',
-            text: 'Tem certeza que deseja cadastrar este produto?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745', // verde
-            cancelButtonColor: '#6c757d', // cinza
-            confirmButtonText: 'Sim, cadastrar',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
-        });
-
-        // Se o usuário confirmar
-        if (result.isConfirmed) {
-            const resposta = await adicionar_dados('produtos', {
-                nome,
-                total_estoque,
-                valor,
-                categoria_selecionada
-            });
-
-            if (resposta.sucesso) {
-                Swal.fire('Sucesso', 'Produto cadastrado com sucesso!', 'success');
-                aba_cadastrar.style.display = 'none';
-                await atualizar_tabela('produtos');
-            } else {
-                Swal.fire('Erro', resposta.mensagem, 'error');
-            }
-        }
-
-    } catch (erro) {
-        console.error(erro);
-        Swal.fire('Erro', 'Não foi possível conectar ao servidor!', 'error');
-    }
-});
 
 

@@ -156,43 +156,39 @@ def mostrar_atributos(nome_tabela, back=False, incluir_id=True, incluir_ativo=Tr
 
 
 @app.route('/<nome_tabela>/adicionar', methods=['POST'])
-def adicionar_produto(nome_tabela):
-    dados = request.get_json()
+def adicionar_valores(nome_tabela):
+    dados = request.get_json()  # recebe JSON do front-end
 
 
     try:
-        nome_tabela = nome_tabela.lower() 
-
-        valores = list(dados.values())
+        # Pega a lista de colunas do banco, exceto id e ativo
+        colunas = mostrar_atributos(nome_tabela, back=True, incluir_id=False, incluir_ativo=False)
         
+        # Garante que os valores estejam na mesma ordem das colunas do banco
+        valores = [dados.get(coluna) for coluna in colunas]
+
+        # Conecta ao banco
         conn = conectar()
         cursor = conn.cursor()
 
-        colunas = mostrar_atributos(nome_tabela, back=True, incluir_id=False, incluir_ativo=False)
+        # Monta a query
         colunas_str = ', '.join(colunas)
-
-        query = f'''
-            INSERT INTO {nome_tabela} ({colunas_str})
-            VALUES ({', '.join(['%s'] * len(colunas))})'''
-
-            
+        placeholders = ', '.join(['%s'] * len(colunas))
+        query = f"INSERT INTO {nome_tabela} ({colunas_str}) VALUES ({placeholders})"
+        
         cursor.execute(query, valores)
         conn.commit()
 
         cursor.close()
         conn.close()
         
-        return jsonify({'sucesso': True, 'mensagem': 'Produto adicionado com sucesso!'}), 200
-    
+        return jsonify({'sucesso': True, 'mensagem': f'{nome_tabela} adicionado com sucesso!'}), 200
     
     except Exception as e:
-    
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
-        return jsonify({'sucesso': False, 'mensagem': str(e)}), 500
+        print(str(e))
+        return jsonify({"erro": str(e)}), 500
+
+
 
 
 
