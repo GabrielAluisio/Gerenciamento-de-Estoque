@@ -13,7 +13,7 @@ CORS(app)
 
 load_dotenv()
 
-
+"""
 def conectar():
     return mysql.connector.connect(
         host=os.getenv("DB_HOST"),      
@@ -22,7 +22,17 @@ def conectar():
         database=os.getenv("DB_NAME"),
         port=3306 
     )
+"""
 
+senha = os.getenv("senha_do_bd") 
+
+def conectar():
+    return mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password=senha,
+        database='PI'
+    )
 
 @app.route("/<nome_tabela>", methods=["GET"])
 def pegar_coluna(nome_tabela):
@@ -176,6 +186,7 @@ def adicionar_valores(nome_tabela):
         placeholders = ', '.join(['%s'] * len(colunas))
         query = f"INSERT INTO {nome_tabela} ({colunas_str}) VALUES ({placeholders})"
         
+        
         cursor.execute(query, valores)
         conn.commit()
 
@@ -194,19 +205,37 @@ def adicionar_valores(nome_tabela):
 
 
 
-@app.route('/<nome_tabela>/desativar/<int:id>', methods=['PATCH'])
-def desativarProduto(nome_tabela, id):
+@app.route('/produtos/desativar/<int:id>', methods=['PATCH'])
+def desativar_produto(id):
+    conn = conectar()
+    cursor = conn.cursor()
 
-    if nome_tabela == 'produtos':
-        query = f" UPDATE {nome_tabela} set ativo = 0 WHERE id = {'%s'}; "
+    query = "UPDATE produtos SET ativo = 0 WHERE id = %s;"
+    cursor.execute(query, (id,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"sucesso": f"Produto {id} desativado"}), 200
+
+
+@app.route('/<nome_tabela>/excluir/<int:id>', methods=['DELETE'])
+def excluir(nome_tabela, id):
 
     conn = conectar()
     cursor = conn.cursor()
 
-    cursor.execute(query, (id, ))
-    conn.commit()
+    query = f"DELETE FROM {nome_tabela} WHERE id = %s;"
+    cursor.execute(query, (id,))
 
-    return jsonify({"sucesso": f"{nome_tabela} {id} desativado"}), 200
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"sucesso": f"{nome_tabela} {id} excluído"}), 200
+
+
 
 
 

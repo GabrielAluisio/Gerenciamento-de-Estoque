@@ -30,8 +30,8 @@
                     <ul id="sub_menu_estoque">
                         <li data-tabela="produtos"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Produtos</p></li>
                         <li data-tabela="Movimentacoes"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Movimentações</p></li>
-                        <li data-tabela="tipo_movimentacoes"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Tipo de Movimentações</p></li>
-                        <li data-tabela="caracteristicas"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Características</p></li>
+                        <li data-tabela="tipos_movimentacoes"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Tipo de Movimentações</p></li>
+                        <li data-tabela="categorias"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Características</p></li>
                     </ul>
                 </li>
             </ul>
@@ -58,7 +58,7 @@
                             <div>
                                 <div>
                                     <label for="nome">Nome: </label>
-                                    <input type="text" name="nome" id="nome_produto">
+                                    <input type="text" name="nome" id="nome">
                                 </div>
                                 
 
@@ -77,7 +77,6 @@
                                 <div>
                                     <label for="categorias">Categoria: </label>
                                     <select name="categorias" id="categoria_id">
-                                        <option value="" disabled selected>Selecione uma categoria</option>
                                     </select>  
                                 </div>
                             </div>
@@ -105,8 +104,7 @@
                             <section>
                                 
                                 <label for="categorias">Categoria: </label>
-                                <select name="categorias" id="categorias">
-                                    <option value="" disabled selected>Selecione uma categoria</option>
+                                <select name="categorias" id="categorias_id">
                                 </select>  
                                 
 
@@ -171,7 +169,6 @@
                                 <div>
                                     <label for="tipos_movimentacoes">Tipo movimentacao: </label>
                                     <select name="tipos_movimentacoes" id="tipo_movimentacao_id">
-                                        <option value="" disabled selected>Selecione uma categoria</option>
                                     </select>  
                                 </div>
                                 
@@ -179,7 +176,6 @@
                                 <div>
                                     <label for="produtos">Produto: </label>
                                     <select name="produtos" id="produto_id">
-                                        <option value="" disabled selected>Selecione uma categoria</option>
                                     </select> 
                                 </div>
                             </div>
@@ -219,8 +215,7 @@
                             <section>
                                 
                                 <label for="tipos_movimentacoes">Tipo_movimentacao: </label>
-                                <select name="tipos_movimentacoes" id="tipos_movimentacoes">
-                                    <option value="" disabled selected>Selecione uma categoria</option>
+                                <select name="tipos_movimentacoes" id="tipos_movimentacoes_id">
                                 </select>  
                                 
 
@@ -265,48 +260,29 @@
             </section>
         </section>
 
-        <section id="produtos_teste" class="tela">
+        <section id="tipos_movimentacoes" class="tela">
             <header>
-                <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>PRODUTOS</p>
+                <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>TIPO DE MOVIMENTAÇÕES</p>
             </header>
             <section>
                     <header>
-                        <h1>Produtos em Estoque</h1>
-                        <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Produto</button>
+                        <h1>Tipo de Movimentações</h1>
+                        <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Tipo de Movimentações</button>
                     </header>
                     <div class="aba_cadastrar">
                         <header>
-                            <h2>Cadastro de Produtos</h2>
+                            <h2>Cadastro de Tipo de Movimentações</h2>
                             <button class="fechar_cadastro"><span class="material-symbols-outlined">close_small</span>Fechar</button>
                         </header>
                         <section>
                             <div>
+
                                 <div>
                                     <label for="nome">Nome: </label>
-                                    <input type="text" name="nome" id="nome_produto">
+                                    <input type="text" name="nome" id="nome">
                                 </div>
-                                
 
-                                <div>
-                                    <label for="total_estoque">Total Estoque: </label>
-                                    <input type="number" name="total_estoque" id="total_estoque">
-                                </div>
                             </div>
-
-                            <div>
-                                <div>
-                                    <label for="valor">valor: </label>
-                                    <input type="number" name="valor" id="valor">
-                                </div>
-
-                                <div>
-                                    <label for="categorias">Categoria: </label>
-                                    <select name="categorias" id="categorias">
-                                        <option value="" disabled selected>Selecione uma categoria</option>
-                                    </select>  
-                                </div>
-                            </div>
-
                             
                         </section>
 
@@ -318,54 +294,7 @@
 
                     <nav>
                         
-                        <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar produto...">
-
-                        <button class="botao_filtros">
-                                <span class="material-symbols-outlined">filter_alt</span>Filtros
-                        </button>
-                        
-                        <div class="cortina_filtros">
-                            <header><span class="material-symbols-outlined">filter_alt</span>Filtros</header>
-                            
-                            <section>
-                                
-                                <label for="categorias_filtro">Categoria: </label>
-                                <select name="categorias_filtro" id="categorias_filtro">
-                                    <option value="" disabled selected>Selecione uma categoria</option>
-                                </select>  
-                                
-
-                                
-                                <label for="preco_min">Preço Miníno: </label>
-                                <input type="number" name="preco_min" id="preco_min">
-                                
-
-                                
-                                <label for="preco_max">Preço Máximo: </label>
-                                <input type="number" name="preco_max" id="preco_max">
-                                
-
-                                
-                                <label for="Estoque_min">Estoque mínimo: </label>
-                                <input type="number" name="Estoque_min" id="Estoque_min">
-                                
-
-                                
-                                <label for="Estoque_max">Estoque Maximo: </label>
-                                <input type="number" name="Estoque_max" id="Estoque_max">
-                                
-                            </section>    
-
-                            <footer>
-                                <button class="botao_fechar">
-                                    Fechar
-                                </button>
-                                <button class="botao_aplicar" id="filtro_aplicar">
-                                    Aplicar
-                                </button>
-                            </footer>
-                                    
-                        </div>
+                        <input type="text" id="pesquisa_tipos_movimentacoes" class="pesquisa" placeholder="Procurar Tipos de movimentacoes...">
                         
                     </nav>
 
@@ -377,48 +306,29 @@
             </section>
         </section>
 
-        <section id="produtos_teste" class="tela">
+        <section id="categorias" class="tela">
             <header>
-                <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>PRODUTOS</p>
+                <p>ESTOQUE</p><span class="material-symbols-outlined">keyboard_double_arrow_right</span> <p>CATEGORIAS</p>
             </header>
             <section>
                     <header>
-                        <h1>Produtos em Estoque</h1>
-                        <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Produto</button>
+                        <h1>Categorias</h1>
+                        <button class="exibir_cadastro"><span class="material-symbols-outlined">add</span>Cadastrar Categorias</button>
                     </header>
                     <div class="aba_cadastrar">
                         <header>
-                            <h2>Cadastro de Produtos</h2>
+                            <h2>Cadastro de Categorias</h2>
                             <button class="fechar_cadastro"><span class="material-symbols-outlined">close_small</span>Fechar</button>
                         </header>
                         <section>
                             <div>
+
                                 <div>
                                     <label for="nome">Nome: </label>
-                                    <input type="text" name="nome" id="nome_produto">
+                                    <input type="text" name="nome" id="nome">
                                 </div>
-                                
 
-                                <div>
-                                    <label for="total_estoque">Total Estoque: </label>
-                                    <input type="number" name="total_estoque" id="total_estoque">
-                                </div>
                             </div>
-
-                            <div>
-                                <div>
-                                    <label for="valor">valor: </label>
-                                    <input type="number" name="valor" id="valor">
-                                </div>
-
-                                <div>
-                                    <label for="categorias">Categoria: </label>
-                                    <select name="categorias" id="categorias">
-                                        <option value="" disabled selected>Selecione uma categoria</option>
-                                    </select>  
-                                </div>
-                            </div>
-
                             
                         </section>
 
@@ -430,54 +340,7 @@
 
                     <nav>
                         
-                        <input type="text" name="pesquisa" id='pesquisa'class="pesquisa" placeholder="Procurar produto...">
-
-                        <button class="botao_filtros">
-                                <span class="material-symbols-outlined">filter_alt</span>Filtros
-                        </button>
-                        
-                        <div class="cortina_filtros">
-                            <header><span class="material-symbols-outlined">filter_alt</span>Filtros</header>
-                            
-                            <section>
-                                
-                                <label for="categorias_filtro">Categoria: </label>
-                                <select name="categorias_filtro" id="categorias_filtro">
-                                    <option value="" disabled selected>Selecione uma categoria</option>
-                                </select>  
-                                
-
-                                
-                                <label for="preco_min">Preço Miníno: </label>
-                                <input type="number" name="preco_min" id="preco_min">
-                                
-
-                                
-                                <label for="preco_max">Preço Máximo: </label>
-                                <input type="number" name="preco_max" id="preco_max">
-                                
-
-                                
-                                <label for="Estoque_min">Estoque mínimo: </label>
-                                <input type="number" name="Estoque_min" id="Estoque_min">
-                                
-
-                                
-                                <label for="Estoque_max">Estoque Maximo: </label>
-                                <input type="number" name="Estoque_max" id="Estoque_max">
-                                
-                            </section>    
-
-                            <footer>
-                                <button class="botao_fechar">
-                                    Fechar
-                                </button>
-                                <button class="botao_aplicar" id="filtro_aplicar">
-                                    Aplicar
-                                </button>
-                            </footer>
-                                    
-                        </div>
+                        <input type="text" id="pesquisa_categorias" class="pesquisa" placeholder="Procurar categorias...">
                         
                     </nav>
 

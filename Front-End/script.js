@@ -1,21 +1,34 @@
 /* Funções */ 
 
 
-async function desativar(nome_tabela, id){
-    fetch(`http://127.0.0.1:5000/${nome_tabela}/desativar/${id}`, {
+async function desativar(id) {
+    fetch(`http://127.0.0.1:5000/produtos/desativar/${id}`, {
         method: 'PATCH'
     })
-
     .then(async response => {
-        if (response.ok) {  // checa se deu sucesso (status 200)
-            await atualizar_tabela(nome_tabela);
+        if (response.ok) {
+            await atualizar_tabela('produtos');
         } else {
             console.error("Erro ao desativar o produto");
         }
     })
-
     .catch(error => console.error(error));
 }
+
+async function deletar(nome_tabela, id) {
+    fetch(`http://127.0.0.1:5000/${nome_tabela}/excluir/${id}`, {
+        method: 'DELETE'
+    })
+    .then(async response => {
+        if (response.ok) {
+            await atualizar_tabela(nome_tabela);
+        } else {
+            console.error("Erro ao excluir o item");
+        }
+    })
+    .catch(error => console.error(error));
+}
+
 
 async function atualizar(nome_tabela, atributo, valor_novo, id){
     try {
@@ -95,13 +108,11 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
 
 
 async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados = false) {
-
     if (dados == null){
         dados = await pegar_dados(nome_tabela, false, mostrar_desativados);
     }
 
     dados_atributos = await pegar_dados(nome_tabela, true);
-    
 
     const tabela = document.querySelector(`#${nome_tabela} #tabela`);
     tabela.innerHTML = ''; 
@@ -114,18 +125,14 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
 
     const th = document.createElement('th');
     th.textContent = '';
-    tr.appendChild(th); // adiciona o th à tr
+    tr.appendChild(th);
 
     dados_atributos.forEach(atributo => {
-        if (atributo == 'ativo'){
-            return;
-        }
+        if (atributo == 'ativo') return;
         const th = document.createElement('th');
-        th.textContent = atributo; // Aqui vai adicionar o atributo no th
-
-        tr.appendChild(th); // adiciona o th à tr
-    })
-        
+        th.textContent = atributo;
+        tr.appendChild(th);
+    });
 
     const tbody = document.createElement('tbody');
     tabela.appendChild(tbody);
@@ -134,8 +141,9 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
         const tr = document.createElement('tr');
         tbody.appendChild(tr);
 
-        // coluna dos botões
-        const div = document.createElement('div');
+        const tdAcoes = document.createElement('td'); // cria td
+        const div = document.createElement('div');    // div dentro do td
+
         const editar = document.createElement('button');
         editar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
         editar.classList.add('editar');
@@ -147,63 +155,79 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
 
         div.appendChild(editar);
         div.appendChild(excluir);
-        tr.appendChild(div);
+        tdAcoes.appendChild(div); // adiciona div no td
+        tr.appendChild(tdAcoes);  // adiciona td na tr
 
-        excluir.addEventListener('click', () => {
+        // listener do excluir
+        excluir.addEventListener('click', async () => {
             Swal.fire({
                 title: 'Tem certeza?',
-                text: 'Você vai desativar este registro!',
+                text: 'Você vai excluir este registro!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sim, desativar!',
+                confirmButtonText: 'Sim, excluir!',
                 cancelButtonText: 'Cancelar'
             }).then(result => {
                 if(result.isConfirmed){
-                    desativar(nome_tabela, linha[0]);
+                    if (nome_tabela_atual == 'produtos'){
+                        desativar(linha[0])
+                    }else{
+                        deletar(nome_tabela, linha[0])
+                    }
+
                 }
             });
         });
 
-        linha.forEach((valor, index) => {
+        // adiciona os dados da linha
+        linha.forEach((valor) => {
             const td = document.createElement('td');
             td.textContent = valor;
             tr.appendChild(td);
         });
 
+        // listener do editar
         editar.addEventListener('click', () => {
-            const tds = tr.querySelectorAll('td');
+            const tds = Array.from(tr.querySelectorAll(`#${nome_tabela} td`)).slice(1);
             const ths = Array.from(document.querySelectorAll(`#${nome_tabela} #tabela thead tr th`)).slice(1);
 
-            // transforma todos em input e guarda valor original e atributo
             tds.forEach((td, i) => {
                 const atributo = ths[i] ? ths[i].textContent : `coluna${i}`;
                 td.dataset.valorOriginal = td.textContent;
                 td.dataset.atributo = atributo;
 
-                if (atributo.toLowerCase().includes('data')) {
-                    // Converte o valor original para o formato YYYY-MM-DDTHH:MM
-                    const valor = new Date(td.textContent).toISOString().slice(0,16);
+                
+                if (atributo.includes('data')) {
+                    let valor = td.textContent.trim();
+                    const partes = valor.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+                    if (partes) {
+                        const [_, dia, mes, ano, hora, minuto] = partes;
+                        valor = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+                    }
                     td.innerHTML = `<input type="datetime-local" value="${valor}">`;
                 } else {
                     td.innerHTML = `<input type="text" value="${td.textContent}">`;
                 }
+
             });
 
-            div.innerHTML = '';
-
-            
+            div.innerHTML = ''; // limpa os botões antigos
 
             const confirmar = document.createElement('button');
             confirmar.innerHTML = '<span class="material-symbols-outlined">check</span>';
             confirmar.className = 'confirmar';
             div.appendChild(confirmar);
 
+            const voltar = document.createElement('button');
+            voltar.innerHTML = '<span class="material-symbols-outlined">close</span>';
+            voltar.className = 'voltar';
+            div.appendChild(voltar);
+
             confirmar.addEventListener('click', async () => {
                 const id = linha[0];
 
-                // pede a confirmação apenas uma vez
                 const result = await Swal.fire({
                     title: 'Confirmar atualização?',
                     text: 'Deseja realmente salvar as alterações?',
@@ -232,17 +256,9 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
                         }
                     }
 
-                    // Só aqui, depois de atualizar todos os campos, atualiza a tabela
                     await atualizar_tabela(nome_tabela);
-}
+                }
             });
-            
-
-            const voltar = document.createElement('button');
-            voltar.innerHTML = '<span class="material-symbols-outlined">close</span>'
-            voltar.className = 'voltar'
-            div.appendChild(voltar)
-
 
             voltar.addEventListener('click', () => {
                 Swal.fire({
@@ -250,21 +266,22 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
                     text: 'As alterações não serão salvas.',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#dc3545', // vermelho
+                    confirmButtonColor: '#dc3545',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Sim, cancelar',
                     cancelButtonText: 'Voltar',
                 }).then(async (result) => {
-                        if (result.isConfirmed) {
-                            await atualizar_tabela(nome_tabela);
-                    }else{
-                        return
+                    if (result.isConfirmed) {
+                        await atualizar_tabela(nome_tabela);
+                    } else {
+                        return;
                     }
-                })  
+                });
             });
-        })
-    })
-};
+        });
+    });
+}
+
 
 let nome_tabela_atual = '';           
 
@@ -290,10 +307,7 @@ abas.forEach(aba => {
 
         // mostra só a selecionada
         document.getElementById(nome_tabela_atual).classList.add('ativa');
-
         await atualizar_tabela(nome_tabela_atual);
-
-
 
         const inputpesquisa = document.getElementById(`pesquisa_${nome_tabela_atual}`);
 
@@ -365,81 +379,84 @@ abas.forEach(aba => {
 
 
         /* Filtro*/ 
+        
 
         const botao_filtros = document.querySelector(`#${nome_tabela_atual} .botao_filtros`)
         const cortina_filtros = document.querySelector(`#${nome_tabela_atual} .cortina_filtros`)
         const botao_fechar_filtro = document.querySelector(`#${nome_tabela_atual} .botao_fechar`)
 
-        botao_filtros.addEventListener('click', () => {
-            cortina_filtros.style.display = 'grid';
-            botao_filtros.style.display = 'none';
-            const valores_inputs = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros input`);
+        if (botao_filtros && cortina_filtros && botao_fechar_filtro) {
+
+            botao_filtros.addEventListener('click', () => {
+                cortina_filtros.style.display = 'grid';
+                botao_filtros.style.display = 'none';
+                const valores_inputs = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros input`);
 
 
-            const filtros = {};
-            valores_inputs.forEach(input => {
-                if(input.value.trim() !== '') {
-                    filtros[input.name] = input.value.trim();
-                }
-            });
+                const filtros = {};
+                valores_inputs.forEach(input => {
+                    if(input.value.trim() !== '') {
+                        filtros[input.name] = input.value.trim();
+                    }
+                });
 
 
-            const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`)
+                const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`)
 
-            selecionar.forEach(campos => {
-                campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+                
 
-                pegar_dados(campos.name)
-                .then(dados => {
-                    dados.forEach(linha => {
-                        const option = document.createElement('option');
-                        option.value = linha[0]
-                        option.textContent = linha[1]; 
-                        campos.appendChild(option);
+                selecionar.forEach(campos => {
+                    pegar_dados(campos.name)
+                    .then(dados => {
+                        // limpa completamente antes de adicionar
+                        campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+                        
+                        dados.forEach(linha => {
+                            const option = document.createElement('option');
+                            option.value = linha[0];
+                            option.textContent = linha[1];
+                            campos.appendChild(option);
+                        });
                     });
                 });
 
-                if (campos.value) {
-                    filtros[campos.name] = campos.value;
-                }
-            });
-
-            const filtro_aplicar = document.getElementById(`filtro_aplicar_${nome_tabela_atual}`)
+                const filtro_aplicar = document.getElementById(`filtro_aplicar_${nome_tabela_atual}`)
 
 
-            filtro_aplicar.addEventListener('click', async () => {
-                const filtros_atualizados = {};
+                filtro_aplicar.addEventListener('click', async () => {
+                    const filtros_atualizados = {};
 
-                // Captura inputs
-                valores_inputs.forEach(input => {
-                    if (input.value.trim() !== '') {
-                        filtros_atualizados[input.name] = input.value.trim();
-                    }
+                    // Captura inputs
+                    valores_inputs.forEach(input => {
+                        if (input.value.trim() !== '') {
+                            filtros_atualizados[input.name] = input.value.trim();
+                        }
+                    });
+
+                    // Captura selects
+                    selecionar.forEach(campos => {
+                        if (campos.value) {
+                            filtros_atualizados[campos.name] = campos.value;
+                        }
+                    });
+
+                    // Cria query string
+                    const params = new URLSearchParams(filtros_atualizados).toString();
+
+                    // Chama o backend
+                    const dados = await pegar_dados(nome_tabela_atual, false, false, '', params);
+
+                    await atualizar_tabela(nome_tabela_atual, dados);
                 });
+                
+            })
 
-                // Captura selects
-                selecionar.forEach(campos => {
-                    if (campos.value) {
-                        filtros_atualizados[campos.name] = campos.value;
-                    }
-                });
+            botao_fechar_filtro.addEventListener('click', () => { 
+                cortina_filtros.style.display = 'none';
+                botao_filtros.style.display = 'flex';
 
-                // Cria query string
-                const params = new URLSearchParams(filtros_atualizados).toString();
-
-                // Chama o backend
-                const dados = await pegar_dados(nome_tabela_atual, false, false, '', params);
-
-                await atualizar_tabela(nome_tabela_atual, dados);
-            });
-            
-        })
-
-        botao_fechar_filtro.addEventListener('click', () => { 
-            cortina_filtros.style.display = 'none';
-            botao_filtros.style.display = 'flex';
-
-        })
+            })
+        }
 
         /* Cadastrar Produto */
 
@@ -451,56 +468,65 @@ abas.forEach(aba => {
         const botao_fechar_cadastro = document.querySelector(`#${nome_tabela_atual} .fechar_cadastro`)
         const botao_voltar_cadastro = document.querySelector(`#${nome_tabela_atual} .botao_voltar`)
 
+        botao_fechar_cadastro.addEventListener('click', () => {
+            aba_cadastrar.style.display = 'none';
+        })
+
+        botao_voltar_cadastro.addEventListener('click', () => {
+            aba_cadastrar.style.display = 'none';
+        })
+
         exibir_cadastro.addEventListener('click', () => {
             aba_cadastrar.style.display = 'flex';
 
 
             const selects = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar select`)
 
-            selects.forEach(campos => {
-                campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+            if (selects.length > 0){
 
-                pegar_dados(campos.name)
-                .then(dados => {
-                    dados.forEach(linha => {
-                        
-                        const option = document.createElement('option');
-                        option.value = linha[0]
-                        option.textContent = linha[1]; 
-                        campos.appendChild(option);
+                selects.forEach(campos => {
+                    campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+
+                    pegar_dados(campos.name)
+                    .then(dados => {
+                        dados.forEach(linha => {
+                            
+                            const option = document.createElement('option');
+                            option.value = linha[0]
+                            option.textContent = linha[1]; 
+                            campos.appendChild(option);
+                        });
                     });
                 });
-            });
+            }
         })
 
         /* Salvar Cadastro */ 
 
-        const botao_salvar = document.querySelector(`#${nome_tabela_atual} .aba_cadastrar .botao_salvar`)
+        const botao_salvar = document.querySelector(`#${nome_tabela_atual} .aba_cadastrar .botao_salvar`);
 
         botao_salvar.addEventListener('click', async () => {
             const cadastro_atualizado = {};
 
+            // Captura e valida inputs
             const cadastrado_inputs = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar input`);
-
-            cadastrado_inputs.forEach(input => {
-                if(input.value.trim() !== '') {
-                    cadastro_atualizado[input.id] = input.value.trim();
-                } else {
+            for (const input of cadastrado_inputs) {
+                if (input.value.trim() === '') {
                     Swal.fire('Erro', 'Por favor, preencha todos os campos!', 'error');
-                    return;
+                    return; // interrompe o clique
                 }
-            });
+                cadastro_atualizado[input.id] = input.value.trim();
+            }
 
+            // Captura e valida selects
             const selects = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar select`);
-
-            // Captura selects
-            selects.forEach(campos => {
-                if (campos.value) {
-                    cadastro_atualizado[campos.id] = campos.value;
+            for (const select of selects) {
+                if (!select.value) {
+                    Swal.fire('Erro', 'Por favor, selecione todos os campos!', 'error');
+                    return; // interrompe o clique
                 }
-            });
-            
-            
+                cadastro_atualizado[select.id] = select.value;
+            }
 
             try {
                 // Alerta de confirmação antes de cadastrar
@@ -509,8 +535,8 @@ abas.forEach(aba => {
                     text: 'Tem certeza que deseja cadastrar este item?',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonColor: '#28a745', // verde
-                    cancelButtonColor: '#6c757d', // cinza
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Sim, cadastrar',
                     cancelButtonText: 'Cancelar',
                     reverseButtons: true
@@ -534,16 +560,7 @@ abas.forEach(aba => {
                 Swal.fire('Erro', 'Não foi possível conectar ao servidor!', 'error');
             }
         });
-
-        botao_fechar_cadastro.addEventListener('click', () => {
-            aba_cadastrar.style.display = 'none';
-        })
-
-        botao_voltar_cadastro.addEventListener('click', () => {
-            aba_cadastrar.style.display = 'none';
-        })
-
-    });
+    })
 }); 
 
 

@@ -18,25 +18,23 @@ CREATE TABLE Produtos (
     FOREIGN KEY(categoria_id) REFERENCES Categorias(id) ON DELETE SET NULL
 );
 
-CREATE TABLE Tipo_movimentacao (
+CREATE TABLE Tipos_movimentacoes (
 	id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     nome varchar(50) NOT NULL UNIQUE
 );
 
-CREATE TABLE Movimentacao (
+CREATE TABLE Movimentacoes (
 	id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    tipo_movimentacao_id INT,
+    tipo_movimentacao_id INT, 
     produto_id INT NOT NULL,
     quantidade INT NOT NULL DEFAULT 1,
     data_movimentacao DATETIME,
-    FOREIGN KEY(tipo_movimentacao_id) REFERENCES Tipo_movimentacao(id) ON DELETE SET NULL,
+    FOREIGN KEY(tipo_movimentacao_id) REFERENCES Tipos_movimentacoes(id) ON DELETE SET NULL,
     FOREIGN KEY(produto_id) REFERENCES Produtos(id) ON DELETE CASCADE
 );
 
+INSERT INTO Categorias (nome) VALUES ('Comida');
+INSERT INTO Categorias (nome) VALUES ('Bebida');
+INSERT INTO Categorias (nome) VALUES ('Sobremesa');
 
-INSERT INTO Categorias (nome) VALUES ('Comida'), ('Bebida'), ('Sobremesa');
-
-INSERT INTO Tipo_movimentacao (nome) VALUES ('Entrada'), ('Saida');
-
-INSERT INTO Movimentacao (tipo_movimentacao_id, produto_id, quantidade, data_movimentacao) values (1, 2, 10, '2025-09-23');
-
+INSERT INTO Tipos_movimentacoes (nome) VALUES ('Entrada'), ('Saida');
