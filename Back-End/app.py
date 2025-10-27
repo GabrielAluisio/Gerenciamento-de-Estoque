@@ -1,5 +1,5 @@
 import mysql.connector
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from datetime import datetime
 
@@ -7,9 +7,18 @@ from datetime import datetime
 from dotenv import load_dotenv
 import os
 
+app = Flask(
+    __name__,
+    template_folder='Front-End',   # pasta onde está o HTML
+    static_folder='Front-End'  
+)
 
-app = Flask(__name__)
 CORS(app)
+
+@app.route('/')
+def home():
+    return render_template('index.html') 
+
 
 load_dotenv()
 

@@ -2,7 +2,7 @@
 
 
 async function desativar(id) {
-    fetch(`http://127.0.0.1:5000/produtos/desativar/${id}`, {
+    fetch(`https://controle-de-estoque-njlq.onrender.com/produtos/desativar/${id}`, {
         method: 'PATCH'
     })
     .then(async response => {
@@ -16,7 +16,7 @@ async function desativar(id) {
 }
 
 async function deletar(nome_tabela, id) {
-    fetch(`http://127.0.0.1:5000/${nome_tabela}/excluir/${id}`, {
+    fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/excluir/${id}`, {
         method: 'DELETE'
     })
     .then(async response => {
@@ -32,7 +32,7 @@ async function deletar(nome_tabela, id) {
 
 async function atualizar(nome_tabela, atributo, valor_novo, id){
     try {
-        const response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atualizar`, {
+        const response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/atualizar`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, nome_tabela, atributo, valor_novo })
@@ -55,7 +55,7 @@ async function atualizar(nome_tabela, atributo, valor_novo, id){
 
 
 async function adicionar_dados(nome_tabela, dados){
-    const res = await fetch(`http://127.0.0.1:5000/${nome_tabela}/adicionar`, {
+    const res = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/adicionar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
@@ -72,9 +72,9 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
         let dados;
 
         if (atributo) { 
-            response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`);
+            response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/atributos`);
         } else { 
-            response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}&id=${id}`);
+            response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}&id=${id}`);
         }
 
         // Verifica se o servidor respondeu corretamente
