@@ -13,7 +13,6 @@ CORS(app)
 
 load_dotenv()
 
-"""
 def conectar():
     return mysql.connector.connect(
         host=os.getenv("DB_HOST"),      
@@ -21,23 +20,14 @@ def conectar():
         password=os.getenv("DB_PASS"),  
         database=os.getenv("DB_NAME"),
         port=3306 
-    )
-"""
-
-senha = os.getenv("senha_do_bd") 
-
-def conectar():
-    return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password=senha,
-        database='PI'
-    )
+)
 
 @app.route("/<nome_tabela>", methods=["GET"])
 def pegar_coluna(nome_tabela):
 
     apagados = request.args.get("apagados", "true").lower() == "true"
+
+    id = request.args.get("id")
 
     letras = request.args.get("letras") 
 
@@ -66,10 +56,18 @@ def pegar_coluna(nome_tabela):
         if apagados:      
             filtros.append("ativo = 0")
         else:
-            query_base = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela}"
-            filtros.append("ativo = 1")
-    
-        print(filtros_get)
+            id_param = request.args.get("id", None)
+
+            if id_param and id_param.lower() != 'false':
+                try:
+                    id_int = int(id_param)
+                    query_base = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela} WHERE id = {id_int}"
+                except ValueError:
+                    return jsonify({"erro": "ID inválido"}), 400
+            else:
+                # Se id não foi enviado ou é 'false', pega todos os produtos
+                query_base = f"SELECT id, nome, total_estoque, valor, categoria_id FROM {nome_tabela}"
+                filtros.append("ativo = 1")
 
         if preco_min:
             filtros.append(f"valor >= {float(preco_min)}")
@@ -120,9 +118,6 @@ def pegar_coluna(nome_tabela):
 
     cursor.execute(query_base)
     result = cursor.fetchall()
-    print(query_base)
-    print('----------')
-    print(result)
 
     novo_result = []
     for linha in result:
@@ -168,36 +163,64 @@ def mostrar_atributos(nome_tabela, back=False, incluir_id=True, incluir_ativo=Tr
 @app.route('/<nome_tabela>/adicionar', methods=['POST'])
 def adicionar_valores(nome_tabela):
     dados = request.get_json()  # recebe JSON do front-end
+    print("📥 Recebido:", dados)
 
+    conn = conectar()
+    cursor = conn.cursor()
 
     try:
-        # Pega a lista de colunas do banco, exceto id e ativo
-        colunas = mostrar_atributos(nome_tabela, back=True, incluir_id=False, incluir_ativo=False)
-        
-        # Garante que os valores estejam na mesma ordem das colunas do banco
-        valores = [dados.get(coluna) for coluna in colunas]
+        # Pega colunas do banco, exceto id e ativo
+        colunas_banco = mostrar_atributos(nome_tabela, back=True, incluir_id=False, incluir_ativo=False)
 
-        # Conecta ao banco
-        conn = conectar()
-        cursor = conn.cursor()
+        # Filtra apenas os campos que vieram do front-end
+        colunas = [col for col in colunas_banco if col in dados]
 
-        # Monta a query
+        # Ordena os valores de acordo com a lista de colunas
+        valores = [dados[col] for col in colunas]
+
+        # --- Inserção padrão ---
         colunas_str = ', '.join(colunas)
         placeholders = ', '.join(['%s'] * len(colunas))
+        print(placeholders) 
+        print(colunas_str)
         query = f"INSERT INTO {nome_tabela} ({colunas_str}) VALUES ({placeholders})"
-        
-        
+        print(query)
         cursor.execute(query, valores)
-        conn.commit()
 
+
+        # --- Lógica especial para movimentações ---
+        if nome_tabela == "movimentacoes":
+            tipo_mov = str(dados.get("tipo_movimentacao_id"))
+            produto_id = int(dados.get("produto_id"))
+            qtd = int(dados.get("quantidade", 0))
+
+            if tipo_mov == "1":  # Entrada
+                cursor.execute(
+                    "UPDATE produtos SET total_estoque = total_estoque + %s WHERE id = %s",
+                    (qtd, produto_id)
+                )
+                print(f"🟢 Entrada: +{qtd} unidades no produto {produto_id}")
+            elif tipo_mov == "2":  # Saída
+                cursor.execute(
+                    "UPDATE produtos SET total_estoque = total_estoque - %s WHERE id = %s",
+                    (qtd, produto_id)
+                )
+                print(f"🔴 Saída: -{qtd} unidades no produto {produto_id}")
+            else:
+                print("⚪ Nenhuma movimentação de estoque (somente registro)")
+
+        conn.commit()
+        return jsonify({'sucesso': True, 'mensagem': f'{nome_tabela} adicionado com sucesso!'}), 200
+
+    except Exception as e:
+        conn.rollback()
+        print("❌ Erro ao adicionar:", e)
+        return jsonify({"erro": str(e)}), 500
+
+    finally:
         cursor.close()
         conn.close()
-        
-        return jsonify({'sucesso': True, 'mensagem': f'{nome_tabela} adicionado com sucesso!'}), 200
-    
-    except Exception as e:
-        print(str(e))
-        return jsonify({"erro": str(e)}), 500
+
 
 
 
@@ -251,15 +274,9 @@ def atualizar_dados(nome_tabela):
         conn = conectar()
         cursor = conn.cursor()
 
-        print("Tabela:", nome_tabela)
-        print("Atributo:", atributo)
-        print("Valor:", valor_novo)
-        print("ID:", id)
         query = f"UPDATE {nome_tabela} SET {atributo} = %s WHERE id = %s"
-        print("Query:", query)
         cursor.execute(query, (valor_novo, id))
         conn.commit()
-        print("Linhas afetadas:", cursor.rowcount)
 
 
         return jsonify({"sucesso": True, 'mensagem': f"{nome_tabela} {id} atualizado"}), 200  

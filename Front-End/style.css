@@ -519,6 +519,11 @@ main {
     background-color: #f2f2f2; /* linhas alternadas */
 }
 
+td:first-child {
+    width: 50px; /* ou outro valor que achar bom */
+    text-align: center; /* centraliza os botões */
+}
+
 
 
 

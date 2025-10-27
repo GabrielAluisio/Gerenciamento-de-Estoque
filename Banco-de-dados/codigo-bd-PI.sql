@@ -5,12 +5,12 @@ USE PI;
 
 CREATE TABLE Categorias (
 	id int AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    nome varchar(100) NOT NULL UNIQUE
+    nome varchar(100) NOT NULL
 );
 
 CREATE TABLE Produtos (
 	id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    nome VARCHAR(100) NOT NULL UNIQUE,
+    nome VARCHAR(100) NOT NULL,
     total_estoque INT NOT NULL DEFAULT 1,
     valor DECIMAL(10,2),
     categoria_id INT,
@@ -20,7 +20,7 @@ CREATE TABLE Produtos (
 
 CREATE TABLE Tipos_movimentacoes (
 	id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    nome varchar(50) NOT NULL UNIQUE
+    nome varchar(50) NOT NULL
 );
 
 CREATE TABLE Movimentacoes (

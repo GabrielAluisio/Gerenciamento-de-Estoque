@@ -66,7 +66,7 @@ async function adicionar_dados(nome_tabela, dados){
     return await res.json(); // retorna o JSON do back-end
 }
 
-async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=false, letras='', filtros='', colunaPesquisa='nome') { 
+async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=false, letras='', filtros='', colunaPesquisa='nome', id=false) { 
     try { 
         let response;
         let dados;
@@ -74,7 +74,7 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
         if (atributo) { 
             response = await fetch(`http://127.0.0.1:5000/${nome_tabela}/atributos`);
         } else { 
-            response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}`);
+            response = await fetch(`http://127.0.0.1:5000/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}&id=${id}`);
         }
 
         // Verifica se o servidor respondeu corretamente
@@ -377,86 +377,68 @@ abas.forEach(aba => {
             await atualizar_tabela(nome_tabela_atual, dados);
         };
 
-
-        /* Filtro*/ 
         
 
-        const botao_filtros = document.querySelector(`#${nome_tabela_atual} .botao_filtros`)
-        const cortina_filtros = document.querySelector(`#${nome_tabela_atual} .cortina_filtros`)
-        const botao_fechar_filtro = document.querySelector(`#${nome_tabela_atual} .botao_fechar`)
+        /* Filtro */
+        const botao_filtros = document.querySelector(`#${nome_tabela_atual} .botao_filtros`);
+        const cortina_filtros = document.querySelector(`#${nome_tabela_atual} .cortina_filtros`);
+        const botao_fechar_filtro = document.querySelector(`#${nome_tabela_atual} .botao_fechar`);
+        const filtro_aplicar = document.getElementById(`filtro_aplicar_${nome_tabela_atual}`);
 
-        if (botao_filtros && cortina_filtros && botao_fechar_filtro) {
+        if (botao_filtros && cortina_filtros && botao_fechar_filtro && filtro_aplicar) {
 
+            // Abrir filtro e popular selects
             botao_filtros.addEventListener('click', () => {
                 cortina_filtros.style.display = 'grid';
                 botao_filtros.style.display = 'none';
+
+                const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`);
+                selecionar.forEach(campos => {
+                    pegar_dados(campos.name)
+                        .then(dados => {
+                            campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+                            dados.forEach(linha => {
+                                const option = document.createElement('option');
+                                option.value = linha[0];
+                                option.textContent = linha[1];
+                                campos.appendChild(option);
+                            });
+                        });
+                });
+            });
+
+            // Aplicar filtro (adicionar listener apenas uma vez!)
+            filtro_aplicar.addEventListener('click', async () => {
                 const valores_inputs = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros input`);
+                const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`);
+                const filtros_atualizados = {};
 
-
-                const filtros = {};
+                // Captura inputs
                 valores_inputs.forEach(input => {
-                    if(input.value.trim() !== '') {
-                        filtros[input.name] = input.value.trim();
+                    if (input.value.trim() !== '') {
+                        filtros_atualizados[input.name] = input.value.trim();
                     }
                 });
 
-
-                const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`)
-
-                
-
+                // Captura selects
                 selecionar.forEach(campos => {
-                    pegar_dados(campos.name)
-                    .then(dados => {
-                        // limpa completamente antes de adicionar
-                        campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
-                        
-                        dados.forEach(linha => {
-                            const option = document.createElement('option');
-                            option.value = linha[0];
-                            option.textContent = linha[1];
-                            campos.appendChild(option);
-                        });
-                    });
+                    if (campos.value) {
+                        filtros_atualizados[campos.name] = campos.value;
+                    }
                 });
 
-                const filtro_aplicar = document.getElementById(`filtro_aplicar_${nome_tabela_atual}`)
+                const params = new URLSearchParams(filtros_atualizados).toString();
+                const dados = await pegar_dados(nome_tabela_atual, false, false, '', params);
+                await atualizar_tabela(nome_tabela_atual, dados);
+            });
 
-
-                filtro_aplicar.addEventListener('click', async () => {
-                    const filtros_atualizados = {};
-
-                    // Captura inputs
-                    valores_inputs.forEach(input => {
-                        if (input.value.trim() !== '') {
-                            filtros_atualizados[input.name] = input.value.trim();
-                        }
-                    });
-
-                    // Captura selects
-                    selecionar.forEach(campos => {
-                        if (campos.value) {
-                            filtros_atualizados[campos.name] = campos.value;
-                        }
-                    });
-
-                    // Cria query string
-                    const params = new URLSearchParams(filtros_atualizados).toString();
-
-                    // Chama o backend
-                    const dados = await pegar_dados(nome_tabela_atual, false, false, '', params);
-
-                    await atualizar_tabela(nome_tabela_atual, dados);
-                });
-                
-            })
-
+            // Fechar filtro
             botao_fechar_filtro.addEventListener('click', () => { 
                 cortina_filtros.style.display = 'none';
                 botao_filtros.style.display = 'flex';
-
-            })
+            });
         }
+
 
         /* Cadastrar Produto */
 
@@ -476,30 +458,39 @@ abas.forEach(aba => {
             aba_cadastrar.style.display = 'none';
         })
 
+        const cacheSelects = {};
+
         exibir_cadastro.addEventListener('click', () => {
             aba_cadastrar.style.display = 'flex';
 
+            const selects = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar select`);
 
-            const selects = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar select`)
+            selects.forEach(async (campos) => {
 
-            if (selects.length > 0){
-
-                selects.forEach(campos => {
+                // Se já tiver dados no cache, só usa
+                if (cacheSelects[campos.name]) {
                     campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
-
-                    pegar_dados(campos.name)
-                    .then(dados => {
-                        dados.forEach(linha => {
-                            
-                            const option = document.createElement('option');
-                            option.value = linha[0]
-                            option.textContent = linha[1]; 
-                            campos.appendChild(option);
-                        });
+                    cacheSelects[campos.name].forEach(linha => {
+                        const option = document.createElement('option');
+                        option.value = linha[0];
+                        option.textContent = linha[1];
+                        campos.appendChild(option);
                     });
-                });
-            }
-        })
+                } else {
+                    // Senão, busca do backend e guarda no cache
+                    const dados = await pegar_dados(campos.name);
+                    cacheSelects[campos.name] = dados; // salva no cache
+
+                    campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+                    dados.forEach(linha => {
+                        const option = document.createElement('option');
+                        option.value = linha[0];
+                        option.textContent = linha[1];
+                        campos.appendChild(option);
+                    });
+                }
+            });
+        });
 
         /* Salvar Cadastro */ 
 
@@ -544,16 +535,17 @@ abas.forEach(aba => {
 
                 // Se o usuário confirmar
                 if (result.isConfirmed) {
-                    const resposta = await adicionar_dados(nome_tabela_atual, cadastro_atualizado);
+                const resposta = await adicionar_dados(nome_tabela_atual, cadastro_atualizado);
 
-                    if (resposta.sucesso) {
-                        Swal.fire('Sucesso', 'Item cadastrado com sucesso!', 'success');
-                        aba_cadastrar.style.display = 'none';
-                        await atualizar_tabela(nome_tabela_atual);
-                    } else {
-                        Swal.fire('Erro', resposta.mensagem, 'error');
-                    }
+                if (resposta.sucesso) {
+                Swal.fire('Sucesso', 'Item cadastrado com sucesso!', 'success');
+                aba_cadastrar.style.display = 'none';
+                await atualizar_tabela(nome_tabela_atual);
+
+                } else {
+                    Swal.fire('Erro', resposta.mensagem, 'error');
                 }
+            }
 
             } catch (erro) {
                 console.error(erro);
@@ -562,22 +554,6 @@ abas.forEach(aba => {
         });
     })
 }); 
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
 
 
 
