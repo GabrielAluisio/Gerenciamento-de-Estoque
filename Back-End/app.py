@@ -9,8 +9,8 @@ import os
 
 app = Flask(
     __name__,
-    template_folder='Front-End',   # pasta onde está o HTML
-    static_folder='Front-End'  
+    template_folder='../Front-End',   # pasta onde está o HTML
+    static_folder='../Front-End'  
 )
 
 CORS(app)
@@ -19,6 +19,9 @@ CORS(app)
 def home():
     return render_template('index.html') 
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204 
 
 load_dotenv()
 
