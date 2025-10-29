@@ -2,7 +2,7 @@
 
 
 async function desativar(id) {
-    fetch(`https://controle-de-estoque-njlq.onrender.com/produtos/desativar/${id}`, {
+    return fetch(`https://controle-de-estoque-njlq.onrender.com/produtos/desativar/${id}`, {
         method: 'PATCH'
     })
     .then(async response => {
@@ -16,7 +16,7 @@ async function desativar(id) {
 }
 
 async function deletar(nome_tabela, id) {
-    fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/excluir/${id}`, {
+    return fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/excluir/${id}`, {
         method: 'DELETE'
     })
     .then(async response => {
@@ -41,7 +41,7 @@ async function atualizar(nome_tabela, atributo, valor_novo, id){
         const data = await response.json();
 
         if(data.sucesso){ // ⚠️ mudou de success para sucesso
-            Swal.fire('Sucesso', data.mensagem, 'success');
+            console.log(data.mensagem)
         } else {
             Swal.fire('Erro', 'Não foi possível atualizar o registro', 'error');
         }
@@ -102,12 +102,21 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
 
 
 
+const loading = document.getElementById("loading-screen");
 
+window.addEventListener("load", () => {
+    // Dá um pequeno delay só pra deixar mais suave (opcional)
+    setTimeout(() => {
+        loading.classList.add("hidden"); // esconde a tela de carregamento
+    }, 1000);
+});
 
 /* Tabela */ 
 
 
 async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados = false) {
+    
+
     if (dados == null){
         dados = await pegar_dados(nome_tabela, false, mostrar_desativados);
     }
@@ -160,7 +169,7 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
 
         // listener do excluir
         excluir.addEventListener('click', async () => {
-            Swal.fire({
+            const result = await Swal.fire({
                 title: 'Tem certeza?',
                 text: 'Você vai excluir este registro!',
                 icon: 'warning',
@@ -169,17 +178,22 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Sim, excluir!',
                 cancelButtonText: 'Cancelar'
-            }).then(result => {
-                if(result.isConfirmed){
-                    if (nome_tabela_atual == 'produtos'){
-                        desativar(linha[0])
-                    }else{
-                        deletar(nome_tabela, linha[0])
-                    }
-
-                }
             });
+
+            if (result.isConfirmed) {
+                loading.classList.remove("hidden");
+
+                if (nome_tabela_atual == 'produtos') {
+                    await desativar(linha[0]); // espera a função terminar
+                } else {
+                    await deletar(nome_tabela, linha[0]);
+                }
+
+                loading.classList.add("hidden");
+            }
+
         });
+
 
         // adiciona os dados da linha
         linha.forEach((valor) => {
@@ -240,6 +254,7 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
                 });
 
                 if (result.isConfirmed) {
+                    loading.classList.remove("hidden");
                     for (const td of tds) {
                         const input = td.querySelector('input');
                         const novoValor = input.value.trim();
@@ -248,15 +263,18 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
 
                         if (novoValor === '') {
                             Swal.fire('Erro', 'O valor não pode ficar vazio!', 'error');
+                            await atualizar_tabela(nome_tabela);
                             return;
                         }
 
                         if (novoValor !== valorOriginal) {
                             await atualizar(nome_tabela, atributo, novoValor, id);
+                            await atualizar_tabela(nome_tabela);
+                            loading.classList.add("hidden");
+                            Swal.fire('Sucesso', 'Item alterado com sucesso!', 'success');
                         }
                     }
 
-                    await atualizar_tabela(nome_tabela);
                 }
             });
 
@@ -283,6 +301,10 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
 }
 
 
+
+
+
+
 let nome_tabela_atual = '';           
 
 
@@ -300,6 +322,8 @@ const telas = document.querySelectorAll('.tela');
 
 abas.forEach(aba => {
     aba.addEventListener('click', async () => {
+        loading.classList.remove("hidden");
+
         nome_tabela_atual = aba.getAttribute('data-tabela').toLowerCase();
 
         // esconde todas as telas
@@ -308,6 +332,8 @@ abas.forEach(aba => {
         // mostra só a selecionada
         document.getElementById(nome_tabela_atual).classList.add('ativa');
         await atualizar_tabela(nome_tabela_atual);
+        
+        loading.classList.add("hidden");
 
         const inputpesquisa = document.getElementById(`pesquisa_${nome_tabela_atual}`);
 
@@ -389,6 +415,7 @@ abas.forEach(aba => {
 
             // Abrir filtro e popular selects
             botao_filtros.addEventListener('click', () => {
+
                 cortina_filtros.style.display = 'grid';
                 botao_filtros.style.display = 'none';
 
@@ -412,6 +439,7 @@ abas.forEach(aba => {
                 const valores_inputs = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros input`);
                 const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`);
                 const filtros_atualizados = {};
+                loading.classList.remove("hidden");
 
                 // Captura inputs
                 valores_inputs.forEach(input => {
@@ -430,6 +458,8 @@ abas.forEach(aba => {
                 const params = new URLSearchParams(filtros_atualizados).toString();
                 const dados = await pegar_dados(nome_tabela_atual, false, false, '', params);
                 await atualizar_tabela(nome_tabela_atual, dados);
+
+                loading.classList.add("hidden");
             });
 
             // Fechar filtro
@@ -499,6 +529,7 @@ abas.forEach(aba => {
         botao_salvar.addEventListener('click', async () => {
             const cadastro_atualizado = {};
 
+
             // Captura e valida inputs
             const cadastrado_inputs = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar input`);
             for (const input of cadastrado_inputs) {
@@ -533,21 +564,26 @@ abas.forEach(aba => {
                     reverseButtons: true
                 });
 
+                loading.classList.remove("hidden");
+
                 // Se o usuário confirmar
                 if (result.isConfirmed) {
                 const resposta = await adicionar_dados(nome_tabela_atual, cadastro_atualizado);
 
                 if (resposta.sucesso) {
-                Swal.fire('Sucesso', 'Item cadastrado com sucesso!', 'success');
-                aba_cadastrar.style.display = 'none';
                 await atualizar_tabela(nome_tabela_atual);
+                aba_cadastrar.style.display = 'none';
+                loading.classList.add("hidden");
+                Swal.fire('Sucesso', 'Item cadastrado com sucesso!', 'success');
 
                 } else {
-                    Swal.fire('Erro', resposta.mensagem, 'error');
+                    loading.classList.add("hidden");
+                    Swal.fire('Erro', resposta.mensagem, 'error');            
                 }
             }
 
             } catch (erro) {
+                loading.classList.add("hidden");
                 console.error(erro);
                 Swal.fire('Erro', 'Não foi possível conectar ao servidor!', 'error');
             }
