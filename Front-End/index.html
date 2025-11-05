@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 <body>
 
@@ -28,9 +30,9 @@
 
     <aside id="menu_lateral">
         <nav>
-            <ul>
-                <li>
-                    <button><span class="material-symbols-outlined"> overview </span> Visão Geral</button>
+            <ul id="menu_estoque">
+                <li class="sem_sub" data-tabela="visao_geral">
+                    <button ><span class="material-symbols-outlined"> overview </span> Visão Geral</button>
                 </li>
                 <li>
                     <button id="botao_estoque"><span class="material-symbols-outlined"> box </span> Estoque</button>
@@ -39,13 +41,46 @@
                         <li data-tabela="produtos"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Produtos</p></li>
                         <li data-tabela="Movimentacoes"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Movimentações</p></li>
                         <li data-tabela="tipos_movimentacoes"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Tipo de Movimentações</p></li>
-                        <li data-tabela="categorias"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Características</p></li>
+                        <li data-tabela="categorias"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Categorias</p></li>
                     </ul>
                 </li>
             </ul>
         </nav>
     </aside>
     <main>
+
+        <section id="visao_geral" class="tela ativa">
+            <header>
+                <p>VISÃO GERAL</p>
+            </header>
+            <section>
+                <header>
+                    <h1>Visão Geral</h1>
+                    <button id="atualizar_graficos"><span class="material-symbols-outlined">refresh</span>Atualizar</button>
+                </header>
+
+
+                <article>
+                    <div id="grafico">
+                        <h2>Quantidade de Saídas</h2>
+                        <canvas id="grafico_quant_sai" ></canvas>
+                    </div>
+                    <div id="grafico">
+                        <h2>Top Produtos em R$</h2>
+                        <canvas id="grafico_preco" ></canvas>
+                    </div>
+                    <div id="grafico">
+                        <h2>Quantidade de Saídas</h2>
+                        <canvas id="grafico_quant_sai" ></canvas>
+                    </div>
+                    <div id="grafico">
+                        <h2>Top Produtos em R$</h2>
+                        <canvas id="grafico_preco" ></canvas>
+                    </div>
+                </article>
+                
+            </section>
+        </section>
         
             
         <section id="produtos" class="tela">

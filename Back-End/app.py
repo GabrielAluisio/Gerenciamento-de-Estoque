@@ -295,6 +295,36 @@ def atualizar_dados(nome_tabela):
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500  
+
+
+@app.route('/visao_geral/grafico/pizza/<tipo>')
+def grafico_pizza(tipo):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    if tipo == "quantidade":
+        query = "SELECT nome, total_estoque FROM produtos WHERE ativo = 1 ORDER BY total_estoque DESC LIMIT 10"
+    elif tipo == "preco":
+        query = "SELECT nome, valor FROM produtos WHERE ativo = 1 ORDER BY valor DESC LIMIT 10"
+    elif tipo == "saida":
+        query = """ SELECT 
+                        p.nome, 
+                        COUNT(m.produto_id) AS `quantidade de saida`
+                    FROM movimentacoes m
+                    JOIN produtos p ON m.produto_id = p.id
+                    WHERE m.tipo_movimentacao_id = 2
+                    GROUP BY p.nome
+                    ORDER BY `quantidade de saida` DESC"""
+    else:
+        return jsonify({"erro": "Tipo inválido"}), 400
+
+    cursor.execute(query)
+    dados = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    print(dados)
+    return jsonify(dados)
+
     
 
 if __name__ == "__main__":
