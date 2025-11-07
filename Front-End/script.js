@@ -104,7 +104,7 @@ let graficos = {}; // objeto global para armazenar os gráficos
 
 async function carregarGraficoPizza(nome_coluna, idCanvas) {
     try {
-        const response = await fetch(`http://127.0.0.1:5000/visao_geral/grafico/pizza/${nome_coluna}`);
+        const response = await fetch(`https://controle-de-estoque-njlq.onrender.com/visao_geral/grafico/pizza/${nome_coluna}`);
         const dados = await response.json();
 
         const nomesProdutos = dados.map(item => item[0]);
