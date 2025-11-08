@@ -100,10 +100,45 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
     } 
 }
 
-async function carregarGrafico(nome_coluna, idCanvas) {
+async function dados_geral() {
     try {
         const response = await fetch(`http://localhost:5000/visao_geral/dados/resumo`);
         const dados = await response.json();
+
+        const produtos = dados.produtos;
+        const saidasMes = dados.saidas_mes;
+        const entradasMes = dados.entradas_mes;
+        const valorEstoque = Number(dados.valor_estoque)
+        const valorFormatado = valorEstoque.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+        const h3produtos = document.getElementById('dado_produtos')
+        const h3saidasMes = document.getElementById('dado_saidas')
+        const h3entradasMes = document.getElementById('dado_entradas')
+        const h3valorEstoque = document.getElementById('dado_total')
+
+        h3produtos.innerText = produtos
+        h3saidasMes.innerText = saidasMes
+        h3entradasMes.innerText = entradasMes
+        h3valorEstoque.innerText = valorFormatado;
+
+        const h4_mes = document.querySelectorAll('.h4_mes');
+
+        const dataAtual = new Date(); 
+        const nomeMes = dataAtual.toLocaleString('pt-BR', { month: 'long' });
+        const mesFormatado = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+
+        h4_mes.forEach(elemento => {
+            if (elemento.innerText.includes(mesFormatado)) {
+                return;
+            } else {
+                elemento.innerText += ` (${mesFormatado})`;
+            }
+        });
+
+
 
     } catch (erro) {
         console.error('Erro ao carregar gráfico:', erro);
@@ -158,7 +193,9 @@ async function carregarGrafico(nome_coluna, idCanvas) {
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.label}: ${context.parsed}`;
+                                const label = context.label?.nome || context.label || '';
+                                const valor = context.parsed?.y ?? context.parsed ?? '';
+                                return `${label}: ${valor}`;
                             }
                         }
                     },
@@ -182,7 +219,7 @@ const loading = document.getElementById("loading-screen");
 
 window.addEventListener("load", () => {
     // Dá um pequeno delay só pra deixar mais suave (opcional)
-    
+        dados_geral()
         carregarGrafico("saida_mes", "grafico_saida_mes");
         carregarGrafico("saida_ano", "grafico_saida_ano");
 
@@ -408,6 +445,7 @@ atualizar_grafico = document.getElementById("atualizar_graficos")
 atualizar_grafico.addEventListener('click', async () => {
     loading.classList.remove("hidden");
 
+    dados_geral()
     carregarGrafico("saida_mes", "grafico_saida_mes");
     carregarGrafico("saida_ano", "grafico_saida_ano");
 
@@ -640,6 +678,7 @@ abas.forEach(aba => {
             const botao_salvar = document.querySelector(`#${nome_tabela_atual} .aba_cadastrar .botao_salvar`);
 
             botao_salvar.addEventListener('click', async () => {
+                loading.classList.add("hidden");
                 const cadastro_atualizado = {};
 
 

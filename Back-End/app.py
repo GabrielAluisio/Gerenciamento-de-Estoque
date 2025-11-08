@@ -298,7 +298,54 @@ def atualizar_dados(nome_tabela):
         return jsonify({"erro": str(e)}), 500  
 
 @app.route('/visao_geral/dados/resumo')
-def dados_(dado):
+def dados_geral():
+    conn = conectar()
+    cursor = conn.cursor()
+
+    ano_atual = date.today().year 
+    mes_atual = date.today().month 
+
+    # 1️⃣ Total de produtos
+    cursor.execute("SELECT COUNT(id) AS produtos FROM produtos WHERE ativo = 1;")
+    total_produtos = cursor.fetchone()[0]
+
+    # 2️⃣ Total de saídas no mês
+    cursor.execute(f"""
+        SELECT COUNT(m.id) AS total_saidas
+        FROM movimentacoes m
+        WHERE m.tipo_movimentacao_id = 2 
+          AND MONTH(m.data_movimentacao) = {mes_atual}
+          AND YEAR(m.data_movimentacao) = {ano_atual};
+    """)
+    total_saidas = cursor.fetchone()[0]
+
+    # 3️⃣ Total de entradas no mês
+    cursor.execute(f"""
+        SELECT COUNT(m.id) AS total_entradas
+        FROM movimentacoes m
+        WHERE m.tipo_movimentacao_id = 1 
+          AND MONTH(m.data_movimentacao) = {mes_atual}
+          AND YEAR(m.data_movimentacao) = {ano_atual};
+    """)
+    total_entradas = cursor.fetchone()[0]
+
+    # 4️⃣ Valor total do estoque
+    cursor.execute("""
+        SELECT SUM(total_estoque * valor) AS total_estoque
+        FROM produtos
+        WHERE ativo = 1;
+    """)
+    total_estoque = cursor.fetchone()[0] or 0  
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({
+        "produtos": total_produtos,
+        "saidas_mes": total_saidas,
+        "entradas_mes": total_entradas,
+        "valor_estoque": total_estoque
+    })
 
 
 @app.route('/visao_geral/grafico/<dado>')

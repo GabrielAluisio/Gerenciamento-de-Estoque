@@ -241,20 +241,18 @@ main {
 
 /* aba Cadastro*/
 .aba_cadastrar{
-
     display: none;
     flex-direction: column;
-    grid-template: 50px 1fr/ 1fr;
+    position: fixed; 
     top: 0;
     right: 0;  
-    position: absolute;
     width: 50vw;
-    height: 100vh;
+    height: 100vh; 
     z-index: 3;
     background-color: #ffffff;
     box-shadow: -12px 9px 20px 0px rgba(0, 0, 0, 0.164);
-    
 }
+
 
 .aba_cadastrar > header{
     background-color: #2d8f3d;
@@ -292,24 +290,36 @@ main {
 }
 
 .aba_cadastrar > section{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
     padding: 20px;
     border-bottom: 1px solid #d1d8db;
     margin-bottom: 20px;
 }
 
-.aba_cadastrar > section > div{
+.aba_cadastrar > section > div {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
     align-items: center;
 }
 
-.aba_cadastrar > section > div> div {
-    width: 100%;
+.aba_cadastrar > section > div > div {
+    flex: 1 1 45%; /* 👈 dois por linha, cada um com ~45% */
+    display: flex;
+    flex-direction: column; /* label em cima do input */
 }
 
-.aba_cadastrar > section select{    
-    cursor: pointer;
+.aba_cadastrar > section input,
+.aba_cadastrar > section select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
 }
 
 .aba_cadastrar > section select:focus, .aba_cadastrar > section input:focus, .aba_cadastrar > section select:hover, .aba_cadastrar > section input:hover{
@@ -636,46 +646,82 @@ button.confirmar:hover {
 
 /* Gráficos */
 
-#visao_geral section article{
+#visao_geral section article {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     flex-wrap: wrap;
-    gap: 60px;
+    gap: 40px;
     grid-area: 2 / 1 / -1 / -1;
+    padding: 20px;
 }
 
-#card_visao{
-    border: .5px solid rgba(0, 0, 0, 0.274);
+#card_visao {
+    border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 14px;
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
     width: 100%;
-    box-shadow: 1px 1px 5px #00000086;
-    margin: 20px;
+    max-width: 100%; /* limita o tamanho para não ficar gigante */
+    box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#conteudo_card{
+#card_visao:hover {
+    transform: translateY(-3px);
+    box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+#conteudo_card {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     flex-wrap: wrap;
     gap: 30px;
-    
 }
 
 #conteudo_card > div {
-    width: 200px;
+    display: flex;     
+    flex-direction: column;         
+    justify-content: center;  
+    align-items: center;        
+    text-align: center; 
 
+    flex: 1 1 200px;
+    min-width: 180px;
+
+    padding: 15px;
+    border-radius: 10px;
 }
 
-.icon_card_visao{
+.icon_card_visao {
     display: flex;
+    align-items: center;
     gap: 10px;
     margin-bottom: 5px;
-    
+}
+
+.icon_card_visao span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+}
+
+.icon_card_visao h3 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: bold;
+}
+
+#conteudo_card h4 {
+    font-size: 15px;
+    color: #333;
+    margin-top: 3px;
 }
 
 #graficos_saidas{
@@ -702,8 +748,12 @@ button.confirmar:hover {
     min-width: 300px;
     max-width: 600px; /* limite máximo para não ficar enorme */
     flex: 1 1 400px; /* se adapta no flex */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.grafico:hover {
+    transform: translateY(-3px);
+}
 .grafico canvas {
     width: 100% !important;
     height: 350px !important;
