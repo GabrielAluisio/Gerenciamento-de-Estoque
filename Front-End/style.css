@@ -646,14 +646,14 @@ button.confirmar:hover {
 }
 
 #card_visao{
-    border: 1px solid rgba(0, 0, 0, 0.555);
+    border: .5px solid rgba(0, 0, 0, 0.274);
     border-radius: 14px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 20px;
     width: 100%;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.178);
+    box-shadow: 1px 1px 5px #00000086;
     margin: 20px;
 }
 
@@ -706,5 +706,5 @@ button.confirmar:hover {
 
 .grafico canvas {
     width: 100% !important;
-    height: 350px !important; /* altura controlada */
+    height: 350px !important;
 }

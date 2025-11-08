@@ -1,7 +1,7 @@
 import mysql.connector
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, date
 
 # Pegar a senha do BD no .env
 from dotenv import load_dotenv
@@ -14,6 +14,7 @@ app = Flask(
 )
 
 CORS(app)
+
 
 @app.route('/')
 def home():
@@ -296,25 +297,47 @@ def atualizar_dados(nome_tabela):
     except Exception as e:
         return jsonify({"erro": str(e)}), 500  
 
+@app.route('/visao_geral/dados/resumo')
+def dados_(dado):
 
-@app.route('/visao_geral/grafico/pizza/<tipo>')
-def grafico_pizza(tipo):
+
+@app.route('/visao_geral/grafico/<dado>')
+def grafico_pizza(dado):
     conn = conectar()
     cursor = conn.cursor()
 
-    if tipo == "quantidade":
+    if dado == "quantidade":
         query = "SELECT nome, total_estoque FROM produtos WHERE ativo = 1 ORDER BY total_estoque DESC LIMIT 10"
-    elif tipo == "preco":
+
+    elif dado == "preco":
         query = "SELECT nome, valor FROM produtos WHERE ativo = 1 ORDER BY valor DESC LIMIT 10"
-    elif tipo == "saida":
-        query = """ SELECT 
+
+    elif dado == "saida_mes":
+        ano_atual = date.today().year 
+        mes_atual = date.today().month 
+
+        query = f""" SELECT 
                         p.nome, 
                         COUNT(m.produto_id) AS `quantidade de saida`
                     FROM movimentacoes m
                     JOIN produtos p ON m.produto_id = p.id
-                    WHERE m.tipo_movimentacao_id = 2
+                    WHERE m.tipo_movimentacao_id = 2 
+                        AND MONTH(m.data_movimentacao) = {mes_atual}
+                        AND YEAR(m.data_movimentacao) = {ano_atual}
                     GROUP BY p.nome
-                    ORDER BY `quantidade de saida` DESC"""
+                    ORDER BY `quantidade de saida` DESC;"""
+        
+    elif dado == "saida_ano":
+        ano_atual = date.today().year 
+        query = f""" SELECT 
+                        p.nome, 
+                        COUNT(m.produto_id) AS `quantidade de saida`
+                    FROM movimentacoes m
+                    JOIN produtos p ON m.produto_id = p.id
+                    WHERE m.tipo_movimentacao_id = 2 
+                        AND YEAR(m.data_movimentacao) = {ano_atual}
+                    GROUP BY p.nome
+                    ORDER BY `quantidade de saida` DESC;"""
     else:
         return jsonify({"erro": "Tipo inválido"}), 400
 

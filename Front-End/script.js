@@ -2,7 +2,7 @@
 
 
 async function desativar(id) {
-    return fetch(`https://controle-de-estoque-njlq.onrender.com/produtos/desativar/${id}`, {
+    return fetch(`http://localhost:5000/produtos/desativar/${id}`, {
         method: 'PATCH'
     })
     .then(async response => {
@@ -16,7 +16,7 @@ async function desativar(id) {
 }
 
 async function deletar(nome_tabela, id) {
-    return fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/excluir/${id}`, {
+    return fetch(`http://localhost:5000/${nome_tabela}/excluir/${id}`, {
         method: 'DELETE'
     })
     .then(async response => {
@@ -32,7 +32,7 @@ async function deletar(nome_tabela, id) {
 
 async function atualizar(nome_tabela, atributo, valor_novo, id){
     try {
-        const response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/atualizar`, {
+        const response = await fetch(`http://localhost:5000/${nome_tabela}/atualizar`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, nome_tabela, atributo, valor_novo })
@@ -55,7 +55,7 @@ async function atualizar(nome_tabela, atributo, valor_novo, id){
 
 
 async function adicionar_dados(nome_tabela, dados){
-    const res = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/adicionar`, {
+    const res = await fetch(`http://localhost:5000/${nome_tabela}/adicionar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
@@ -72,9 +72,9 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
         let dados;
 
         if (atributo) { 
-            response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/atributos`);
+            response = await fetch(`http://localhost:5000/${nome_tabela}/atributos`);
         } else { 
-            response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}&id=${id}`);
+            response = await fetch(`http://localhost:5000/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}&id=${id}`);
         }
 
         // Verifica se o servidor respondeu corretamente
@@ -100,11 +100,22 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
     } 
 }
 
+async function carregarGrafico(nome_coluna, idCanvas) {
+    try {
+        const response = await fetch(`http://localhost:5000/visao_geral/dados/resumo`);
+        const dados = await response.json();
+
+    } catch (erro) {
+        console.error('Erro ao carregar gráfico:', erro);
+    }
+}
+
+
 let graficos = {}; // objeto global para armazenar os gráficos
 
-async function carregarGraficoPizza(nome_coluna, idCanvas) {
+async function carregarGrafico(nome_coluna, idCanvas) {
     try {
-        const response = await fetch(`https://controle-de-estoque-njlq.onrender.com/visao_geral/grafico/pizza/${nome_coluna}`);
+        const response = await fetch(`http://localhost:5000/visao_geral/grafico/${nome_coluna}`);
         const dados = await response.json();
 
         const nomesProdutos = dados.map(item => item[0]);
@@ -114,6 +125,14 @@ async function carregarGraficoPizza(nome_coluna, idCanvas) {
         const cores = nomesProdutos.map((_, index) => coresPadrao[index % coresPadrao.length]);
 
         const ctx = document.getElementById(idCanvas).getContext('2d');
+        
+        const h5 = document.getElementById("h5_saida_mes")
+        
+        const dataAtual = new Date(); 
+        const nomeMes = dataAtual.toLocaleString('pt-BR', { month: 'long' });
+        const mesFormatado = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+
+        h5.innerText = `(${mesFormatado})`
 
         // 🔥 se já existir um gráfico nesse canvas, destrói antes de criar outro
         if (graficos[idCanvas]) {
@@ -164,8 +183,8 @@ const loading = document.getElementById("loading-screen");
 window.addEventListener("load", () => {
     // Dá um pequeno delay só pra deixar mais suave (opcional)
     
-        carregarGraficoPizza("saida", "grafico_quant_sai");
-        carregarGraficoPizza("preco", "grafico_preco");
+        carregarGrafico("saida_mes", "grafico_saida_mes");
+        carregarGrafico("saida_ano", "grafico_saida_ano");
 
     setTimeout(() => {
         loading.classList.add("hidden"); // esconde a tela de carregamento
@@ -389,8 +408,8 @@ atualizar_grafico = document.getElementById("atualizar_graficos")
 atualizar_grafico.addEventListener('click', async () => {
     loading.classList.remove("hidden");
 
-    carregarGraficoPizza("saida", "grafico_quant_sai");
-    carregarGraficoPizza("preco", "grafico_preco");
+    carregarGrafico("saida_mes", "grafico_saida_mes");
+    carregarGrafico("saida_ano", "grafico_saida_ano");
 
     setTimeout(() => {
         loading.classList.add("hidden"); // esconde a tela de carregamento
@@ -412,13 +431,9 @@ abas.forEach(aba => {
         document.getElementById(nome_tabela_atual).classList.add('ativa');
         if (nome_tabela_atual !== 'visao_geral') {
             await atualizar_tabela(nome_tabela_atual);
+            
         }
-    
 
-        atualizar_grafico = document.getElementById("atualizar_graficos") 
-
-        
-        
         loading.classList.add("hidden");
 
         const inputpesquisa = document.getElementById(`pesquisa_${nome_tabela_atual}`);
@@ -503,25 +518,27 @@ abas.forEach(aba => {
         if (botao_filtros && cortina_filtros && botao_fechar_filtro && filtro_aplicar) {
 
             // Abrir filtro e popular selects
-            botao_filtros.addEventListener('click', () => {
-
+            botao_filtros.addEventListener('click', async () => {
                 cortina_filtros.style.display = 'grid';
                 botao_filtros.style.display = 'none';
+                loading.classList.remove("hidden");
 
                 const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`);
-                selecionar.forEach(campos => {
-                    pegar_dados(campos.name)
-                        .then(dados => {
-                            campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
-                            dados.forEach(linha => {
-                                const option = document.createElement('option');
-                                option.value = linha[0];
-                                option.textContent = linha[1];
-                                campos.appendChild(option);
-                            });
-                        });
-                });
+
+                for (const campos of selecionar) {
+                    const dados = await pegar_dados(campos.name);
+                    campos.innerHTML = '<option value="" disabled selected>Selecione</option>';
+                    dados.forEach(linha => {
+                        const option = document.createElement('option');
+                        option.value = linha[0];
+                        option.textContent = linha[1];
+                        campos.appendChild(option);
+                    });
+                }
+
+                loading.classList.add("hidden");
             });
+
 
             // Aplicar filtro (adicionar listener apenas uma vez!)
             filtro_aplicar.addEventListener('click', async () => {
@@ -582,6 +599,8 @@ abas.forEach(aba => {
             const cacheSelects = {};
 
             exibir_cadastro.addEventListener('click', () => {
+                loading.classList.remove("hidden");
+
                 aba_cadastrar.style.display = 'flex';
 
                 const selects = document.querySelectorAll(`#${nome_tabela_atual} .aba_cadastrar select`);
@@ -596,7 +615,9 @@ abas.forEach(aba => {
                             option.value = linha[0];
                             option.textContent = linha[1];
                             campos.appendChild(option);
+    
                         });
+                        loading.classList.add("hidden");
                     } else {
                         // Senão, busca do backend e guarda no cache
                         const dados = await pegar_dados(campos.name);
@@ -609,6 +630,7 @@ abas.forEach(aba => {
                             option.textContent = linha[1];
                             campos.appendChild(option);
                         });
+                        loading.classList.add("hidden");
                     }
                 });
             });
@@ -679,6 +701,7 @@ abas.forEach(aba => {
                     Swal.fire('Erro', 'Não foi possível conectar ao servidor!', 'error');
                 }
             });
+            loading.classList.add("hidden");
         }
     })
 }); 
