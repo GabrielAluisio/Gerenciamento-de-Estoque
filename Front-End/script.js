@@ -133,6 +133,7 @@ async function carregarGraficoPizza(nome_coluna, idCanvas) {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, 
                 plugins: {
                     legend: { display: false },
                     tooltip: {

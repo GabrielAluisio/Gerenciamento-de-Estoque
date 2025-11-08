@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Estoque</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
-
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+    <link rel="stylesheet" href="style.css">
 
     <link href="https://fonts.googleapis.cm/css2?family=Inter&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -61,22 +61,66 @@
 
 
                 <article>
-                    <div id="grafico">
-                        <h2>Quantidade de Saídas</h2>
-                        <canvas id="grafico_quant_sai" ></canvas>
+                    <div id="card_visao">
+                        <h3>Visão Geral</h3>
+                        <div id="conteudo_card">
+                            <div>
+                                <div class="icon_card_visao">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: white; background-color: #8B4513;; border-radius: 5px; padding: 3px;">inventory_2</span>
+                                    <h3>60</h3>
+                                </div>
+                                <h4>Produtos</h4>
+                            </div>
+                            <div>
+                                <div class="icon_card_visao">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; color: white; background-color: #228B22;; border-radius: 5px; padding: 1px;">arrow_outward</span>
+                                    <h3>60</h3>
+                                </div>
+                                <h4>Saidas (nesse mês)</h4>
+                            </div>
+                            <div>
+                                <div class="icon_card_visao">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; color: white; background-color: #d31f1f;; border-radius: 5px; padding: 1px;">arrow_downward</span>
+                                    <h3>60</h3>
+                                </div>
+                                <h4>Entradas (nesse mês)</h4>
+                            </div>
+                            <div>
+                                <div class="icon_card_visao">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; color: white; background-color: #32CD32; border-radius: 5px; padding: 1px;" >attach_money</span>
+                                    <h3>R$ 4.520,00</h3>
+                                </div>
+                                <h4>Valor total em produtos</h4>
+                            </div>
+                        </div>
                     </div>
-                    <div id="grafico">
-                        <h2>Top Produtos em R$</h2>
-                        <canvas id="grafico_preco" ></canvas>
+                    <div id="graficos_saidas">
+                        <h2>Controle de Saidas</h2>
+                        <div>
+                            <div class="grafico">
+                                <h3>Mensal</h3>
+                                <canvas id="grafico_quant_sai"></canvas>
+                            </div>
+                            <div class="grafico">
+                                <h3>Anual</h3>
+                                <canvas id="grafico_preco"></canvas>
+                                
+                            </div>
+                        </div>
                     </div>
-                    <div id="grafico">
-                        <h2>Quantidade de Saídas</h2>
-                        <canvas id="grafico_quant_sai" ></canvas>
-                    </div>
-                    <div id="grafico">
-                        <h2>Top Produtos em R$</h2>
-                        <canvas id="grafico_preco" ></canvas>
-                    </div>
+
+                     <!-- <div id="graficos_preços">
+                        <div id="grafico">
+                            <h2>Top Produtos em R$</h2>
+                            
+                        </div>
+                        
+                        <div id="grafico">
+                            <h2>Top Produtos em R$</h2>
+                            
+                        </div>
+                    </div>-->
+                    
                 </article>
                 
             </section>
@@ -399,7 +443,7 @@
 
     </main>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-
+    <!-- <script src="{{ url_for('static', filename='script.js') }}"></script> -->
+    <script src="script.js"></script>
 </body>
 </html>

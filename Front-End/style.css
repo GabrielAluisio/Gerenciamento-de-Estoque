@@ -641,18 +641,70 @@ button.confirmar:hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    gap: 60px;
     grid-area: 2 / 1 / -1 / -1;
 }
 
-#grafico{
+#card_visao{
+    border: 1px solid rgba(0, 0, 0, 0.555);
+    border-radius: 14px;
+    padding: 20px;
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
-    border-radius: 20px;
-    min-width: 200px;
-    width: 50%; 
-
-    padding: 50px 50px 0px 50px;
+    gap: 20px;
+    width: 100%;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.178);
+    margin: 20px;
 }
 
+#conteudo_card{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    
+}
+
+#conteudo_card > div {
+    width: 200px;
+
+}
+
+.icon_card_visao{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+    
+}
+
+#graficos_saidas{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+#graficos_saidas > div{
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap; /* permite que os gráficos quebrem linha */
+    justify-content: space-around;
+}
+
+.grafico {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0px 40px 40px 40px;
+    min-width: 300px;
+    max-width: 600px; /* limite máximo para não ficar enorme */
+    flex: 1 1 400px; /* se adapta no flex */
+}
+
+.grafico canvas {
+    width: 100% !important;
+    height: 350px !important; /* altura controlada */
+}
