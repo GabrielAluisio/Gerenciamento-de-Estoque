@@ -782,7 +782,8 @@ button.confirmar:hover {
     margin-top: 3px;
 }
 
-#graficos_saidas{
+#graficos_saidas, 
+#graficos_preços {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -790,32 +791,109 @@ button.confirmar:hover {
     gap: 30px;
 }
 
+/* container interno que segura os gráficos */
 #graficos_saidas > div{
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center; 
+    gap: 30px;
+}
+
+#graficos_preços > div{
     width: 100%;
-    flex-wrap: wrap; /* permite que os gráficos quebrem linha */
-    justify-content: space-around;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
 }
 
 .grafico {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    margin: 0px 40px 40px 40px;
-    min-width: 300px;
-    max-width: 600px; /* limite máximo para não ficar enorme */
-    flex: 1 1 400px; /* se adapta no flex */
+    flex: 1 1 45%;        
+    min-width: 350px;
+    max-width: 500px;     
+    height: 400px;        
+    margin: 0;
+    border-radius: 12px;
+    background: #fff;    
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .grafico:hover {
     transform: translateY(-3px);
 }
+
+/* canvas com tamanho fixo */
 .grafico canvas {
     width: 100% !important;
-    height: 350px !important;
+    height: 100% !important;
+    max-height: 350px; /* evita variação de altura */
 }
+#tabela_preco_container {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    height: 100%;
+    width: 70%;
+    background-color: rgb(223, 223, 223);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px #0000001a;
+    margin: 30px auto;
+    overflow-x: auto;
+}
+
+#tabela_preco {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    background-color: rgb(223, 223, 223);
+    table-layout: fixed; /* 🔥 força o navegador a respeitar as larguras */
+}
+
+#tabela_preco th, 
+#tabela_preco td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #d1d8db;
+    font-size: 15px;
+    color: #000000cc;
+    word-wrap: break-word; /* evita que o texto estoure a célula */
+}
+
+#tabela_preco th {
+    background-color: #0387a5; /* azul do header */
+    color: white;
+    font-weight: 600;
+    padding: 25px;
+    border-bottom: 2px solid #ddd;
+}
+
+/* 🔥 Define a proporção das colunas */
+#tabela_preco th:nth-child(1),
+#tabela_preco td:nth-child(1) {
+    width: 35%;
+}
+
+#tabela_preco th:nth-child(2),
+#tabela_preco td:nth-child(2) {
+    width: 30%;
+}
+
+#tabela_preco th:nth-child(3),
+#tabela_preco td:nth-child(3) {
+    width: 20%;
+}
+
+#tabela_preco tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#tabela_preco tbody tr:hover {
+    background-color: #e7f4f8;
+    transition: background-color 0.2s ease;
+}
+
 
 
 @media screen and (max-width: 900px) {

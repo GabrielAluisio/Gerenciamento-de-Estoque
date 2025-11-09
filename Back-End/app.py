@@ -357,7 +357,17 @@ def grafico_pizza(dado):
         query = "SELECT nome, total_estoque FROM produtos WHERE ativo = 1 ORDER BY total_estoque DESC LIMIT 10"
 
     elif dado == "preco":
-        query = "SELECT nome, valor FROM produtos WHERE ativo = 1 ORDER BY valor DESC LIMIT 10"
+        query = """
+                    SELECT 
+                        nome,
+                        ROUND(SUM(total_estoque * valor), 2) AS valor_total,
+                        ROUND((SUM(total_estoque * valor) / 
+                            (SELECT SUM(total_estoque * valor) FROM produtos WHERE ativo = 1)) * 100, 2) AS porcentagem
+                    FROM produtos
+                    WHERE ativo = 1
+                    GROUP BY nome
+                    ORDER BY valor_total DESC;
+                """
 
     elif dado == "saida_mes":
         ano_atual = date.today().year 

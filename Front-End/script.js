@@ -2,7 +2,7 @@
 
 
 async function desativar(id) {
-    return fetch(`http://localhost:5000/produtos/desativar/${id}`, {
+    return fetch(`https://controle-de-estoque-njlq.onrender.com/produtos/desativar/${id}`, {
         method: 'PATCH'
     })
     .then(async response => {
@@ -16,7 +16,7 @@ async function desativar(id) {
 }
 
 async function deletar(nome_tabela, id) {
-    return fetch(`http://localhost:5000/${nome_tabela}/excluir/${id}`, {
+    return fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/excluir/${id}`, {
         method: 'DELETE'
     })
     .then(async response => {
@@ -55,7 +55,7 @@ async function atualizar(nome_tabela, atributo, valor_novo, id){
 
 
 async function adicionar_dados(nome_tabela, dados){
-    const res = await fetch(`http://localhost:5000/${nome_tabela}/adicionar`, {
+    const res = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/adicionar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
@@ -72,9 +72,9 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
         let dados;
 
         if (atributo) { 
-            response = await fetch(`http://localhost:5000/${nome_tabela}/atributos`);
+            response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/atributos`);
         } else { 
-            response = await fetch(`http://localhost:5000/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}&id=${id}`);
+            response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}?${filtros}&apagados=${mostrar_desativados}&letras=${letras}&pesquisa=${colunaPesquisa}&id=${id}`);
         }
 
         // Verifica se o servidor respondeu corretamente
@@ -102,7 +102,7 @@ async function pegar_dados(nome_tabela, atributo=false, mostrar_desativados=fals
 
 async function dados_geral() {
     try {
-        const response = await fetch(`http://localhost:5000/visao_geral/dados/resumo`);
+        const response = await fetch(`https://controle-de-estoque-njlq.onrender.com/visao_geral/dados/resumo`);
         const dados = await response.json();
 
         const produtos = dados.produtos;
@@ -148,9 +148,9 @@ async function dados_geral() {
 
 let graficos = {}; // objeto global para armazenar os gráficos
 
-async function carregarGrafico(nome_coluna, idCanvas) {
+async function carregarGrafico(nome_coluna, idCanvas, tipo = 'bar') {
     try {
-        const response = await fetch(`http://localhost:5000/visao_geral/grafico/${nome_coluna}`);
+        const response = await fetch(`https://controle-de-estoque-njlq.onrender.com/visao_geral/grafico/${nome_coluna}`);
         const dados = await response.json();
 
         const nomesProdutos = dados.map(item => item[0]);
@@ -161,13 +161,13 @@ async function carregarGrafico(nome_coluna, idCanvas) {
 
         const ctx = document.getElementById(idCanvas).getContext('2d');
         
-        const h5 = document.getElementById("h5_saida_mes")
-        
-        const dataAtual = new Date(); 
-        const nomeMes = dataAtual.toLocaleString('pt-BR', { month: 'long' });
-        const mesFormatado = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
-
-        h5.innerText = `(${mesFormatado})`
+        const h5 = document.getElementById("h5_saida_mes");
+        if (h5) {
+            const dataAtual = new Date(); 
+            const nomeMes = dataAtual.toLocaleString('pt-BR', { month: 'long' });
+            const mesFormatado = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+            h5.innerText = `(${mesFormatado})`;
+        }
 
         // 🔥 se já existir um gráfico nesse canvas, destrói antes de criar outro
         if (graficos[idCanvas]) {
@@ -175,34 +175,41 @@ async function carregarGrafico(nome_coluna, idCanvas) {
         }
 
         graficos[idCanvas] = new Chart(ctx, {
-            type: 'bar',
+            type: tipo,
             data: {
                 labels: nomesProdutos,
                 datasets: [{
                     data: valores,
                     backgroundColor: cores,
-                    borderColor: '#fff',
-                    borderWidth: 1
+                    borderWidth: 0 // 🔥 remove totalmente a borda branca entre as fatias
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, 
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: { 
+                        display: tipo === 'pie', 
+                        position: 'bottom'
+                    },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                const label = context.label?.nome || context.label || '';
-                                const valor = context.parsed?.y ?? context.parsed ?? '';
-                                return `${label}: ${valor}`;
+                                const label = context.label || '';
+                                const valor = context.parsed || 0;
+                                // só adiciona o símbolo % se for gráfico de pizza
+                                return tipo === 'pie' ? `${label}: ${valor}%` : `${label}: ${valor}`;
                             }
                         }
                     },
                     datalabels: {
                         color: '#fff',
-                        font: { weight: 'bold' },
-                        formatter: (value) => value
+                        font: {
+                            weight: 'bold',
+                            size: 16 
+                        },
+                        
+                        formatter: (value) => tipo === 'pie' ? value + '%' : value
                     }
                 }
             },
@@ -220,13 +227,48 @@ async function carregarGrafico(nome_coluna, idCanvas) {
 }
 
 
+
+async function carregarTabelaPreco() {
+    try {
+        const response = await fetch(`https://controle-de-estoque-njlq.onrender.com/visao_geral/grafico/preco`);
+        const dados = await response.json();
+
+        // Limpa o corpo da tabela
+        const tbody = document.querySelector("#tabela_preco tbody");
+        tbody.innerHTML = '';
+
+        dados.forEach(item => {
+            const [nome, valorTotal, porcentagem] = item; // agora são 3 valores
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${nome}</td>
+                <td>R$ ${Number(valorTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                <td>${Number(porcentagem).toFixed(2)}%</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (erro) {
+        console.error("Erro ao carregar tabela de preços:", erro);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro ao carregar tabela',
+            text: 'Não foi possível obter os dados do servidor.'
+        });
+    }
+}
+
+
+
 const loading = document.getElementById("loading-screen");
 
 window.addEventListener("load", () => {
     // Dá um pequeno delay só pra deixar mais suave (opcional)
-        dados_geral()
-        carregarGrafico("saida_mes", "grafico_saida_mes");
-        carregarGrafico("saida_ano", "grafico_saida_ano");
+    dados_geral()
+    carregarGrafico("saida_mes", "grafico_saida_mes");
+    carregarGrafico("saida_ano", "grafico_saida_ano",);
+    
+    carregarTabelaPreco()
 
     setTimeout(() => {
         loading.classList.add("hidden"); // esconde a tela de carregamento
@@ -481,7 +523,9 @@ atualizar_grafico.addEventListener('click', async () => {
 
     dados_geral()
     carregarGrafico("saida_mes", "grafico_saida_mes");
-    carregarGrafico("saida_ano", "grafico_saida_ano");
+    carregarGrafico("saida_ano", "grafico_saida_ano",);
+    carregarGrafico("preco", "grafico_preco", 'pie');
+    carregarTabelaPreco()
 
     setTimeout(() => {
         loading.classList.add("hidden"); // esconde a tela de carregamento

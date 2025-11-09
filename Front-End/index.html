@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Estoque</title>
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
 
     <link href="https://fonts.googleapis.cm/css2?family=Inter&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -117,17 +117,26 @@
                         </div>
                     </div>
 
-                     <!-- <div id="graficos_preços">
-                        <div id="grafico">
-                            <h2>Top Produtos em R$</h2>
-                            
+                    <div id="graficos_preços">
+                        <h2>Análise de Valor Total por Produto</h2>
+                        <div>
+                            <div id="tabela_preco_container">
+                                <table id="tabela_preco">
+                                    <thead>
+                                        <tr>
+                                            <th>Produto</th>
+                                            <th>Valor Total (R$)</th>
+                                            <th>Porcentagem (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- preenchido via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        
-                        <div id="grafico">
-                            <h2>Top Produtos em R$</h2>
-                            
-                        </div>
-                    </div>-->
+                    </div>
+
                     
                 </article>
                 
@@ -451,7 +460,7 @@
 
     </main>
 
-    <!-- <script src="{{ url_for('static', filename='script.js') }}"></script> -->
-    <script src="script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    
 </body>
 </html>
