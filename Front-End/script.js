@@ -524,7 +524,6 @@ atualizar_grafico.addEventListener('click', async () => {
     dados_geral()
     carregarGrafico("saida_mes", "grafico_saida_mes");
     carregarGrafico("saida_ano", "grafico_saida_ano",);
-    carregarGrafico("preco", "grafico_preco", 'pie');
     carregarTabelaPreco()
 
     setTimeout(() => {
