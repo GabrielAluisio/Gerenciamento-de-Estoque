@@ -711,7 +711,6 @@ button.confirmar:hover {
     flex-wrap: wrap;
     gap: 40px;
     grid-area: 2 / 1 / -1 / -1;
-    padding: 20px;
 }
 
 #card_visao {
@@ -722,7 +721,7 @@ button.confirmar:hover {
     flex-direction: column;
     gap: 25px;
     width: 100%;
-    max-width: 100%; /* limita o tamanho para não ficar gigante */
+    max-width: 100%; 
     box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -849,7 +848,8 @@ button.confirmar:hover {
     border-collapse: collapse;
     text-align: center;
     background-color: rgb(223, 223, 223);
-    table-layout: fixed; /* 🔥 força o navegador a respeitar as larguras */
+    table-layout: fixed;
+
 }
 
 #tabela_preco th, 
