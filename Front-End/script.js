@@ -396,6 +396,9 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
 
                 if (result.isConfirmed) {
                     loading.classList.remove("hidden");
+
+                    let houveAlteracao = false; // 👈 flag pra saber se algo foi alterado
+
                     for (const td of tds) {
                         const input = td.querySelector('input');
                         const novoValor = input.value.trim();
@@ -410,14 +413,21 @@ async function atualizar_tabela(nome_tabela, dados = null, mostrar_desativados =
 
                         if (novoValor !== valorOriginal) {
                             await atualizar(nome_tabela, atributo, novoValor, id);
-                            await atualizar_tabela(nome_tabela);
-                            loading.classList.add("hidden");
-                            Swal.fire('Sucesso', 'Item alterado com sucesso!', 'success');
+                            houveAlteracao = true; // 👈 marca que houve uma alteração
                         }
                     }
 
+                    if (houveAlteracao) {
+                        await atualizar_tabela(nome_tabela);
+                        loading.classList.add("hidden");
+                        Swal.fire('Sucesso', 'Item alterado com sucesso!', 'success');
+                    } else {
+                        loading.classList.add("hidden");
+                        Swal.fire('Info', 'Nenhuma alteração foi feita.', 'info');
+                    }
                 }
             });
+
 
             voltar.addEventListener('click', () => {
                 Swal.fire({
