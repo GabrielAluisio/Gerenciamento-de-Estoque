@@ -20,8 +20,8 @@
     </div>
 
     <header>
-        <button id="botao_menu"> 
-            <span class="material-symbols-outlined" id="icon_menu">
+        <button id="botao_menu" class="botoes_menu"> 
+            <span class="material-symbols-outlined" id="icon_menu" style="color: white;">
                 menu
             </span>
         </button>
@@ -31,11 +31,18 @@
     <aside id="menu_lateral">
         <nav>
             <ul id="menu_estoque">
+                <div>
+                    <button id="botao_close" class="botoes_menu"> 
+                        <span class="material-symbols-outlined" id="icon_close" style="color: white;">
+                            close
+                        </span>
+                    </button>
+                </div>
                 <li class="sem_sub" data-tabela="visao_geral">
-                    <button ><span class="material-symbols-outlined"> overview </span> Visão Geral</button>
+                    <button class="botao_menu_lateral" ><span class="material-symbols-outlined"> overview </span> Visão Geral</button>
                 </li>
                 <li>
-                    <button id="botao_estoque"><span class="material-symbols-outlined"> box </span> Estoque</button>
+                    <button class="botao_menu_lateral" id="botao_estoque"><span class="material-symbols-outlined"> box </span> Estoque</button>
 
                     <ul id="sub_menu_estoque">
                         <li data-tabela="produtos"><span class="material-symbols-outlined">radio_button_unchecked </span><p>Produtos</p></li>
@@ -158,8 +165,8 @@
 
                             <div>
                                 <div>
-                                    <label for="valor">valor: </label>
-                                    <input type="number" name="valor" id="valor">
+                                    <label for="valor">valor (unidade): </label>
+                                    <input type="number" name="valor" id="valor" placeholder="Ex: 18.50" >
                                 </div>
 
                                 <div>

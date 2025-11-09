@@ -1,5 +1,6 @@
 @charset "UTF-8";
 
+
 :root {
     --header: #265DA6;
     --menu_lateral: #0B2940;
@@ -31,7 +32,7 @@ body, html {
 body{
     display: grid;
     min-height: 100vh;
-    grid-template: 60px auto/ 220px 3fr;
+    grid-template: 75px auto/ 220px 3fr;
 }
 
 /*Tela de Carregamento*/
@@ -77,30 +78,78 @@ body{
 
 
 body > header{
-    display: flex;
-    
+    display: none;
+    padding: 20px;
     align-items: center;
-
     grid-area: 1 / 1 / 2 / -1;
     background-color: var(--header);
     color: white;
+    position: fixed;
+    width: 100%;
     box-shadow: 1px 1px 5px #000000b4;
+    height: 75px;
+    z-index: 2;
 }
 
-#botao_menu {
+#menu_estoque > div {
+        display: none;
+    }
+
+.botoes_menu {
     background-color: transparent;
     border: 0px;
+    border-radius: 20px;
 }
 
-#botao_menu{
+#icon_menu{
+    cursor: pointer;
+    font-size: 25px;
+}
+
+.botoes_menu:hover{
+    background-color: rgba(255, 255, 255, 0.192);
+}
+
+#botao_menu:active {
+    background-color: rgba(255, 255, 255, 0.307);
+}
+
+.botoes_menu{
     cursor: pointer;
 }
 
+#botao_menu{
+    padding: 7px 7px 5px 7px;
+}
+
+#botao_close{
+    padding: 0px 7px;
+}
+
+#botao_close:hover{
+    background-color: var(--menu_lateral_hover);
+}
+
+
+
+#botao_close:active{
+    background-color: #0c2f49;;
+}
+
 #menu_lateral {
-    grid-area: 2 / 1 / -1 / 2;
+    grid-area: 1 / 1 / -1 / 2;
     background-color: var(--menu_lateral);
     box-shadow: 1px 1px 5px #000000;
 }
+
+.invisivel {
+    display: none !important;
+}
+
+.ativo {
+    display: flex !important;
+}
+
 
 #menu_lateral > nav > ul{
     display: flex; 
@@ -110,7 +159,11 @@ body > header{
     letter-spacing: .5px;
 }
 
-#menu_lateral button {
+#menu_lateral > nav{
+    width: 100%;
+}
+
+#menu_lateral .botao_menu_lateral {
     background-color: var(--menu_lateral);
     border: 1px solid transparent;
     color: rgba(255, 255, 255, 0.781);
@@ -125,8 +178,12 @@ body > header{
     letter-spacing: .5px;
 }
 
-#menu_lateral button:hover {
+#menu_lateral .botao_menu_lateral:hover {
     background-color: var(--menu_lateral_hover);
+}
+
+#menu_lateral .botao_menu_lateral:active {
+    background-color: #0c2f49;;
 }
 
 #botao_estoque.ativo {
@@ -165,7 +222,7 @@ body > header{
 
 
 main {
-    grid-area: 2 / 2 / -1 / -1;
+    grid-area: 1 / 2 / -1 / -1;
 }
 
 /* Aqui começa a conversão da área de estoque → produtos */
@@ -197,7 +254,7 @@ main {
 
 .tela > section {
     display: grid;
-    grid-template: 70px 100px 1fr / 1fr;
+    grid-template: auto 100px 1fr / 1fr;
     box-shadow: 1px 1px 5px #0000004f;
     margin: 0px 20px 20px 20px;
     border-radius: 20px;
@@ -209,7 +266,8 @@ main {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 5px;
+    flex-wrap: wrap;
+    gap: 20px;
     color: #000000cc;
     font-size: 15px;
     padding: 25px;
@@ -373,7 +431,7 @@ main {
 
 .tela nav .pesquisa{
     max-width: 500px;
-    width: 35vw;
+    width: 40vw;
     height: 35px;
     padding: 10px;
     font-size: 14px;
@@ -757,4 +815,55 @@ button.confirmar:hover {
 .grafico canvas {
     width: 100% !important;
     height: 350px !important;
+}
+
+
+@media screen and (max-width: 900px) {
+    body > header{
+        display: flex;
+    }
+
+    main {
+        grid-area: 2 / 1 / -1 / -1;
+    }
+
+    #menu_estoque > div {
+        display: flex;
+        justify-content: end;
+        align-content: center;
+        padding: 10px 15px 10px 0px;
+        color: white;
+        height: 60px;
+    }
+
+    #menu_lateral {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        z-index: 3;
+    }
+
+    .aba_cadastrar{
+        display: none;
+        flex-direction: column;
+        position: fixed; 
+        top: 0;
+        right: 0;  
+        width: 60vw;
+    }
+}
+
+@media screen and (min-width: 901px) {
+    #menu_lateral {
+        display: flex;
+    }
+
+    #botao_menu,
+    #botao_close {
+        display: none;
+    }
 }

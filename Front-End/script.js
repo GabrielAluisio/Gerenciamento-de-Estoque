@@ -210,7 +210,12 @@ async function carregarGrafico(nome_coluna, idCanvas) {
         });
 
     } catch (erro) {
-        console.error('Erro ao carregar gráfico:', erro);
+        Swal.fire({
+            icon: 'error',
+            title: 'Servidor Offline',
+            text: 'Não foi possível conectar ao servidor. Servidor offline ou erro de conexão',
+            confirmButtonText: 'Ok'
+        });
     }
 }
 
@@ -226,6 +231,25 @@ window.addEventListener("load", () => {
     setTimeout(() => {
         loading.classList.add("hidden"); // esconde a tela de carregamento
     }, 1000);
+});
+
+
+const botao_menu = document.getElementById('botao_menu');
+const botao_close = document.getElementById('botao_close');
+const menu_lateral = document.getElementById('menu_lateral');
+
+// abrir menu
+botao_menu.addEventListener('click', () => {
+    menu_lateral.classList.add('ativo');
+    botao_menu.classList.add('invisivel');
+    botao_close.classList.remove('invisivel');
+});
+
+// fechar menu
+botao_close.addEventListener('click', () => {
+    menu_lateral.classList.remove('ativo');
+    botao_close.classList.add('invisivel');
+    botao_menu.classList.remove('invisivel');
 });
 
 /* Tabela */ 
@@ -483,14 +507,18 @@ abas.forEach(aba => {
                 e.preventDefault(); // previne efeito do Enter
                 inputpesquisa.blur();
 
+                loading.classList.remove("hidden");
+
                 // Verifica campo vazio
                 if (inputpesquisa.value.trim() === "") {
+                    loading.classList.add("hidden");
                     Swal.fire({
                         icon: 'warning',
                         title: 'Campo vazio!',
                         text: 'Digite algo para pesquisar.',
                         confirmButtonColor: '#007bff',
                     });
+                    
                     return; // impede que continue a execução
                 }
 
@@ -506,6 +534,7 @@ abas.forEach(aba => {
 
                 // Nenhum dado encontrado
                 if (!dados || dados.length === 0){
+                    loading.classList.add("hidden");
                     Swal.fire({
                         icon: 'info',
                         iconColor: '#ff934aff',
@@ -513,36 +542,17 @@ abas.forEach(aba => {
                         text: `Não foram encontrados produtos com "${inputpesquisa.value}".`,
                         confirmButtonColor: '#007bff',
                     });
+                    
                     return; // para aqui, não atualiza a tabela
                 }
 
                 
                 await atualizar_tabela(nome_tabela_atual, dados);
+                loading.classList.add("hidden");
             }
             };
 
-            inputpesquisa.oninput = async () => {
-                const valorPesquisa = inputpesquisa.value.trim();
-
-                if (valorPesquisa === "") {
-                    // Opcional: atualizar tabela com todos os produtos ou limpar
-                    const todosProdutos = await pegar_dados(nome_tabela_atual, false);
-                    await atualizar_tabela(nome_tabela_atual, todosProdutos);
-                    return;
-                }
-
-                let colunaPesquisa = 'nome'
-
-                    if (nome_tabela_atual === 'movimentacoes') {
-
-                        colunaPesquisa = 'produto_id'; 
-                }
-
-                const dados = await pegar_dados(nome_tabela_atual, false, false, valorPesquisa, false, colunaPesquisa);
-
-                // Atualiza tabela com os resultados
-                await atualizar_tabela(nome_tabela_atual, dados);
-            };
+        
         }
 
         
@@ -557,9 +567,10 @@ abas.forEach(aba => {
 
             // Abrir filtro e popular selects
             botao_filtros.addEventListener('click', async () => {
+                loading.classList.remove("hidden");
                 cortina_filtros.style.display = 'grid';
                 botao_filtros.style.display = 'none';
-                loading.classList.remove("hidden");
+                
 
                 const selecionar = document.querySelectorAll(`#${nome_tabela_atual} .cortina_filtros select`);
 
@@ -688,6 +699,12 @@ abas.forEach(aba => {
                     if (input.value.trim() === '') {
                         Swal.fire('Erro', 'Por favor, preencha todos os campos!', 'error');
                         return; // interrompe o clique
+                    }
+
+                    if (input.id === 'valor') {
+                        if (input.value.includes(',')) {
+                            input.value = input.value.replace(',', '.');
+                        }
                     }
                     cadastro_atualizado[input.id] = input.value.trim();
                 }
