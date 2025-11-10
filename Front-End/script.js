@@ -32,7 +32,7 @@ async function deletar(nome_tabela, id) {
 
 async function atualizar(nome_tabela, atributo, valor_novo, id){
     try {
-        const response = await fetch(`http://localhost:5000/${nome_tabela}/atualizar`, {
+        const response = await fetch(`https://controle-de-estoque-njlq.onrender.com/${nome_tabela}/atualizar`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, nome_tabela, atributo, valor_novo })
