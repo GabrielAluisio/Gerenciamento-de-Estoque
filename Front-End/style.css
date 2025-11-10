@@ -360,7 +360,7 @@ main {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
     align-items: center;
 }
 
@@ -519,6 +519,7 @@ main {
     font-size: 17px;
     margin-bottom: 10px;
     width: 100%;
+    min-width: 150px;
     outline: none;
     padding: 5px 10px;
     border-radius: 20px;
