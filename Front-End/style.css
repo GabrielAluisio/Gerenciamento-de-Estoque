@@ -705,6 +705,7 @@ button.confirmar:hover {
 /* Gráficos */
 
 #visao_geral section article {
+    padding: 20px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -714,7 +715,6 @@ button.confirmar:hover {
 }
 
 #card_visao {
-    margin-top: 20px;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 14px;
     padding: 25px;
@@ -837,6 +837,7 @@ button.confirmar:hover {
     align-items: start;
     height: 100%;
     width: 70%;
+    min-width: 350px;
     background-color: rgb(223, 223, 223);
     border-radius: 10px;
     box-shadow: 0 2px 10px #0000001a;
@@ -904,6 +905,10 @@ button.confirmar:hover {
 
     main {
         grid-area: 2 / 1 / -1 / -1;
+    }
+
+    #visao_geral section article h2{
+        font-size: 22px;
     }
 
     #menu_estoque > div {
