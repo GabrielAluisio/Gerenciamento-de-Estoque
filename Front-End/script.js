@@ -735,6 +735,7 @@ abas.forEach(aba => {
                         loading.classList.add("hidden");
                     }
                 });
+                loading.classList.add("hidden");
             });
 
             /* Salvar Cadastro */ 
