@@ -783,27 +783,28 @@ abas.forEach(aba => {
                         confirmButtonColor: '#28a745',
                         cancelButtonColor: '#6c757d',
                         confirmButtonText: 'Sim, cadastrar',
-                        cancelButtonText: 'Cancelar',
-                        reverseButtons: true
+                    
                     });
 
-                    loading.classList.remove("hidden");
+                    
 
                     // Se o usuário confirmar
                     if (result.isConfirmed) {
-                    const resposta = await adicionar_dados(nome_tabela_atual, cadastro_atualizado);
+                        loading.classList.remove("hidden");
+                        const resposta = await adicionar_dados(nome_tabela_atual, cadastro_atualizado);
 
-                    if (resposta.sucesso) {
-                    await atualizar_tabela(nome_tabela_atual);
-                    aba_cadastrar.style.display = 'none';
-                    loading.classList.add("hidden");
-                    Swal.fire('Sucesso', 'Item cadastrado com sucesso!', 'success');
-
-                    } else {
+                        if (resposta.sucesso) {
+                        await atualizar_tabela(nome_tabela_atual);
+                        aba_cadastrar.style.display = 'none';
                         loading.classList.add("hidden");
-                        Swal.fire('Erro', resposta.mensagem, 'error');            
+                        Swal.fire('Sucesso', 'Item cadastrado com sucesso!', 'success');
+
+                        } else {
+                            loading.classList.add("hidden");
+                            Swal.fire('Erro', resposta.mensagem, 'error');            
+                        }
+                        loading.classList.add("hidden");
                     }
-                }
 
                 } catch (erro) {
                     loading.classList.add("hidden");
